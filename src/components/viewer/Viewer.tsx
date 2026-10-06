@@ -1,4 +1,5 @@
 import { CadScene } from "./CadScene";
+import { ComponentGallery } from "./ComponentGallery";
 import { SceneLabel as Html } from "./SceneLabel";
 import type React from "react";
 import { Canvas } from "@react-three/fiber";
@@ -37,6 +38,7 @@ interface Props {
 }
 
 export default function Viewer({ parts, params, provenance, revision, visualAssets }: Props) {
+  const mode = useViewer((s) => s.mode);
   return (
     <div data-viewer-root className="relative h-full w-full">
       <Canvas
@@ -45,7 +47,7 @@ export default function Viewer({ parts, params, provenance, revision, visualAsse
         camera={{ position: [0.22, 0.18, 0.22], fov: 32, near: 0.001, far: 10 }}
         gl={{ antialias: true }}
       >
-        <color attach="background" args={["#efece5"]} />
+        <color attach="background" args={["#ffffff"]} />
         <ambientLight intensity={0.35} />
         <directionalLight
           position={[0.4, 0.8, 0.3]}
@@ -70,6 +72,8 @@ export default function Viewer({ parts, params, provenance, revision, visualAsse
         </Environment>
         {revision?.assembly ? (
           <CadScene manifest={revision.assembly} visualAssets={visualAssets} />
+        ) : mode !== "cad" && visualAssets?.length ? (
+          <ComponentGallery parts={parts} visualAssets={visualAssets} />
         ) : (
           <Scene parts={parts} params={params} />
         )}
@@ -80,10 +84,10 @@ export default function Viewer({ parts, params, provenance, revision, visualAsse
           blur={2.4}
           far={0.2}
         />
-        <gridHelper args={[0.6, 30, "#cfcac0", "#e0dcd3"]} position={[0, -0.001, 0]} />
+        <gridHelper args={[0.6, 30, "#d2d7dc", "#eef0f2"]} position={[0, -0.001, 0]} />
       </Canvas>
       <div data-viewer-labels className="pointer-events-none absolute inset-0 overflow-hidden" />
-      <div className="label-mono pointer-events-none absolute bottom-3 right-4 text-[9.5px] text-muted-foreground">
+      <div className="pointer-events-none absolute bottom-2 left-3 right-3 text-right text-[11px] leading-relaxed text-muted-foreground">
         {provenance}
       </div>
     </div>

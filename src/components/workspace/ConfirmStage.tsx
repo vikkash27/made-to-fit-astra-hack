@@ -9,7 +9,10 @@ import { useProjectAction } from "@/lib/api/hooks";
 import { parseDimensionInput, partFullyConfirmed } from "@/lib/domain/dimensions";
 import { ViewerPanel } from "@/components/viewer/ViewerPanel";
 import { Btn, ErrorNote, Label, SampleTag, StatusPill } from "./ui";
+import { PartThumbnail } from "./PartsStage";
+import { AskAstra } from "./WorkspaceAssistant";
 import { buildParts } from "@/lib/domain/build-parts";
+import { AutomaticDimensions } from "./AutomaticDimensions";
 
 export const DEFAULT_PARAMS: EnclosureParams = {
   wall: 2,
@@ -18,9 +21,9 @@ export const DEFAULT_PARAMS: EnclosureParams = {
   cornerRadius: 4,
 };
 const AXES = [
-  { k: "x", l: "Width X" },
-  { k: "y", l: "Depth Y" },
-  { k: "z", l: "Height Z" },
+  { k: "x", l: "Width" },
+  { k: "y", l: "Depth" },
+  { k: "z", l: "Height" },
 ] as const;
 
 export function ConfirmStage({ project, go }: { project: Project; go: (s: Stage) => void }) {
@@ -31,15 +34,18 @@ export function ConfirmStage({ project, go }: { project: Project; go: (s: Stage)
   );
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(520px,640px)_1fr]">
-      <aside className="min-h-0 overflow-y-auto border-r border-border/60 px-6 py-8 lg:px-10">
-        <Label>{project.goal ?? "Your project"} / Dimensions</Label>
-        <h1 className="display-tight mt-5 text-[clamp(40px,4.2vw,64px)]">Confirm what fits.</h1>
+    <div className="grid grid-cols-1 gap-8 p-4 sm:p-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <aside className="min-w-0">
+        <h1 className="stage-heading">Measure what goes inside.</h1>
         <p className="mt-4 max-w-md text-muted-foreground">
-          Source values are proposals until you accept them. Blank means unknown — never zero.
-          Millimetres, X width · Y depth · Z height.
+          Measure each part in millimetres, including connectors and tall components. Review
+          proposed values before confirming. Blank dimensions stay unknown.
         </p>
-        <div className="mt-8 space-y-4">
+        <div className="mt-4">
+          <AskAstra prompt="Explain how to measure the parts used in my project" />
+        </div>
+        <AutomaticDimensions project={project} />
+        <div className="mt-6 space-y-5">
           {parts.map((p) => (
             <PartDims key={p.id} project={project} part={p} />
           ))}
@@ -62,7 +68,7 @@ export function ConfirmStage({ project, go }: { project: Project; go: (s: Stage)
             final design.
           </p>
         )}
-        <div className="mt-8 flex items-center gap-3">
+        <div className="sticky bottom-0 mt-8 flex flex-wrap items-center gap-3 border-t border-border bg-white py-4">
           <Btn
             variant="primary"
             className="h-11"
@@ -73,7 +79,7 @@ export function ConfirmStage({ project, go }: { project: Project; go: (s: Stage)
           </Btn>
           {!allOk && (
             <span className="text-sm text-muted-foreground">
-              Confirm every identity and dimension first.
+              Confirm every part’s identity, width, depth and height to continue.
             </span>
           )}
         </div>
@@ -81,11 +87,16 @@ export function ConfirmStage({ project, go }: { project: Project; go: (s: Stage)
           <ErrorNote error={draft.error} />
         </div>
       </aside>
-      <div className="relative min-h-[420px]">
+      <div className="viewer-frame overflow-hidden rounded-lg">
         <ViewerPanel
           parts={parts}
+          visualAssets={project.visualAssets}
           params={allOk ? DEFAULT_PARAMS : null}
-          provenance="Layout preview · dimensions pending · not CAD"
+          provenance={
+            allOk
+              ? "Measured envelope preview · not built CAD"
+              : "Dimensions pending · no measured fit yet"
+          }
           compact
         />
       </div>
@@ -94,18 +105,20 @@ export function ConfirmStage({ project, go }: { project: Project; go: (s: Stage)
 }
 
 function PartDims({ project, part }: { project: Project; part: Part }) {
+  const estimate = part.dimensionEstimate;
+  const estimated = { x: estimate?.width, y: estimate?.depth, z: estimate?.height };
   const [draft, setDraft] = useState<Record<string, string>>(() =>
     Object.fromEntries(
-      AXES.map((a) => [a.k, part.size[a.k].value == null ? "" : String(part.size[a.k].value)]),
+      AXES.map((a) => [a.k, String(part.size[a.k].value ?? estimated[a.k]?.value_mm ?? "")]),
     ),
   );
   // When a spec lookup brings in new proposed values, fill any still-blank boxes.
-  const sizeKey = AXES.map((a) => part.size[a.k].value ?? "").join("|");
+  const sizeKey = AXES.map((a) => part.size[a.k].value ?? estimated[a.k]?.value_mm ?? "").join("|");
   useEffect(() => {
     setDraft((d) => {
       const next = { ...d };
       for (const a of AXES)
-        if (!next[a.k] && part.size[a.k].value != null) next[a.k] = String(part.size[a.k].value);
+        if (!next[a.k]) next[a.k] = String(part.size[a.k].value ?? estimated[a.k]?.value_mm ?? "");
       return next;
     });
   }, [sizeKey]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -130,6 +143,13 @@ function PartDims({ project, part }: { project: Project; part: Part }) {
     ad.confirmComponents(project.id, project.draftVersion, [
       {
         id: part.id,
+        dimensionsSource: AXES.some(
+          (a) =>
+            estimated[a.k]?.value_mm != null &&
+            parseDimensionInput(draft[a.k] ?? "") === estimated[a.k]?.value_mm,
+        )
+          ? "user_confirmed_photo_estimate"
+          : "user_measurement",
         accept: acceptAll || undefined,
         evidenceDecisions: (evidence.data?.proposals ?? [])
           .filter((v) => v.evidenceId && chosenEvidence[v.field] === v.evidenceId)
@@ -148,12 +168,16 @@ function PartDims({ project, part }: { project: Project; part: Part }) {
   );
 
   const src = evidence.data?.sources[0];
+  const [sourcesOpen, setSourcesOpen] = useState(false);
   return (
-    <div className="rounded-md border border-border bg-surface/60 p-4">
+    <div className="border-b border-border pb-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2 text-[15px]">
-            {part.label} {part.sample && <SampleTag />}
+            <PartThumbnail project={project} part={part} />
+            <span>
+              {part.label} {part.sample && <SampleTag />}
+            </span>
           </div>
           <div className="text-xs text-muted-foreground">
             {part.identityAccepted ? (
@@ -168,7 +192,10 @@ function PartDims({ project, part }: { project: Project; part: Part }) {
         <Btn
           variant="outline"
           className="h-8 px-3 text-xs"
-          onClick={() => lookup.mutate([])}
+          onClick={() => {
+            setSourcesOpen(true);
+            lookup.mutate([]);
+          }}
           disabled={!!job || lookup.isPending}
         >
           <Search className="size-3.5" /> Look up specs
@@ -179,7 +206,14 @@ function PartDims({ project, part }: { project: Project; part: Part }) {
           const f = part.size[a.k];
           return (
             <label key={a.k} className="text-xs text-muted-foreground">
-              {a.l} · <StatusPill status={f.status} />
+              {a.l} ·{" "}
+              {f.status !== "accepted" && f.value == null && estimated[a.k]?.value_mm != null ? (
+                <span className="text-warning">
+                  Photo estimate · {estimated[a.k]?.confidence} confidence
+                </span>
+              ) : (
+                <StatusPill status={f.status} />
+              )}
               <div className="mt-1 flex items-center rounded-sm border border-border bg-background focus-within:border-primary">
                 <input
                   inputMode="decimal"
@@ -205,72 +239,112 @@ function PartDims({ project, part }: { project: Project; part: Part }) {
           );
         })}
       </div>
-      {src && (
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          Source:{" "}
-          <a href={src.url} target="_blank" rel="noreferrer" className="underline">
-            {src.title}
-          </a>
-          {evidence.data?.sample && " (sample)"}
-          {evidence.data?.missing.length
-            ? ` · Missing: ${evidence.data.missing.join(", ").toUpperCase()}`
-            : ""}
-        </p>
-      )}
-      {evidence.data?.proposals.length ? (
-        <div className="mt-3 space-y-2 border-t border-border pt-3">
-          <p className="text-xs text-muted-foreground">
-            Source proposals · review the hardware variant before accepting
+      {estimate && !partFullyConfirmed(part) && (
+        <div className="mt-3 text-xs leading-relaxed text-muted-foreground">
+          <p>
+            Prefilled from photo proportions and common sizes. These are estimates; check with a
+            ruler or calipers before confirming.
           </p>
-          {evidence.data.proposals.map((proposal, i) => {
-            const source = evidence.data.sources.find((s) => s.id === proposal.sourceId);
-            return (
-              <div
-                key={proposal.evidenceId ?? i}
-                className="flex flex-wrap items-center gap-2 text-xs"
-              >
-                <span>
-                  {proposal.field.toUpperCase()} · {proposal.value} mm ·{" "}
-                  {proposal.applicability ?? "sample"} · {proposal.acceptance ?? "proposed"}
-                </span>
-                {source && (
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary underline"
-                  >
-                    {source.title}
-                  </a>
-                )}
-                <Btn
-                  variant="outline"
-                  className="h-7 px-2 text-xs"
-                  disabled={proposal.applicability === "chip_only"}
-                  onClick={() => {
-                    setDraft((d) => ({ ...d, [proposal.field]: String(proposal.value) }));
-                    if (proposal.evidenceId)
-                      setChosenEvidence((d) => ({ ...d, [proposal.field]: proposal.evidenceId! }));
-                  }}
-                >
-                  Use proposal
-                </Btn>
-                {proposal.applicability === "chip_only" && (
-                  <span>Chip size cannot establish this module’s envelope.</span>
-                )}
-              </div>
-            );
-          })}
+          <details className="mt-2">
+            <summary>How Astra estimated these sizes</summary>
+            <ul className="mt-2 space-y-2">
+              {AXES.map((a) => (
+                <li key={a.k}>
+                  <b>{a.l}:</b>{" "}
+                  {estimated[a.k]?.range_mm ? `${estimated[a.k]!.range_mm!.join("–")} mm · ` : ""}
+                  {estimated[a.k]?.basis}
+                </li>
+              ))}
+            </ul>
+          </details>
         </div>
-      ) : null}
+      )}
+      {src && (
+        <details
+          open={sourcesOpen}
+          onToggle={(e) => setSourcesOpen(e.currentTarget.open)}
+          className="mt-4"
+        >
+          <summary className="text-xs font-medium text-muted-foreground">
+            Specification evidence · review before use
+          </summary>
+          {src && (
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Source:{" "}
+              <a href={src.url} target="_blank" rel="noreferrer" className="underline">
+                {src.title}
+              </a>
+              {evidence.data?.sample && " (sample)"}
+              {evidence.data?.missing.length
+                ? ` · Missing: ${evidence.data.missing.join(", ").toUpperCase()}`
+                : ""}
+            </p>
+          )}
+          {evidence.data?.proposals.length ? (
+            <div className="mt-3 space-y-2 border-t border-border pt-3">
+              <p className="text-xs text-muted-foreground">
+                Source proposals · review the hardware variant before accepting
+              </p>
+              {evidence.data.proposals.map((proposal, i) => {
+                const source = evidence.data.sources.find((s) => s.id === proposal.sourceId);
+                return (
+                  <div
+                    key={proposal.evidenceId ?? i}
+                    className="flex flex-wrap items-center gap-2 text-xs"
+                  >
+                    <span>
+                      {proposal.field.toUpperCase()} · {proposal.value} mm ·{" "}
+                      {proposal.applicability ?? "sample"} · {proposal.acceptance ?? "proposed"}
+                    </span>
+                    {source && (
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline"
+                      >
+                        {source.title}
+                      </a>
+                    )}
+                    <Btn
+                      variant="outline"
+                      className="h-7 px-2 text-xs"
+                      disabled={proposal.applicability === "chip_only"}
+                      onClick={() => {
+                        setDraft((d) => ({ ...d, [proposal.field]: String(proposal.value) }));
+                        if (proposal.evidenceId)
+                          setChosenEvidence((d) => ({
+                            ...d,
+                            [proposal.field]: proposal.evidenceId!,
+                          }));
+                      }}
+                    >
+                      Use proposal
+                    </Btn>
+                    {proposal.applicability === "chip_only" && (
+                      <span>Chip size cannot establish this module’s envelope.</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
+        </details>
+      )}
       <div className="mt-3 flex gap-2">
         <Btn
           variant="primary"
           className="h-8 px-3 text-xs"
-          disabled={confirm.isPending}
+          disabled={
+            confirm.isPending ||
+            AXES.some((a) => {
+              const n = parseDimensionInput(draft[a.k] ?? "");
+              return n == null || n <= 0;
+            })
+          }
           onClick={() => confirm.mutate([true])}
         >
-          <Check className="size-3.5" /> Accept identity & values
+          <Check className="size-3.5" /> Confirm identity & measurements
         </Btn>
       </div>
       {evidenceJob?.stage === "failed" && <JobProgress job={evidenceJob} />}

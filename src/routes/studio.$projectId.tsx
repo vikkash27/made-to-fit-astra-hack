@@ -1,8 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Project, Stage } from "@/lib/domain/types";
 import { useProject } from "@/lib/api/hooks";
+import { buildParts } from "@/lib/domain/build-parts";
 import { partFullyConfirmed } from "@/lib/domain/dimensions";
+import { stageAccess, STAGE_LABELS } from "@/lib/domain/stage-access";
+import { AutomaticReferences } from "@/components/workspace/AutomaticReferences";
+import { WorkspaceAssistant } from "@/components/workspace/WorkspaceAssistant";
+import { JobProgress } from "@/components/workspace/JobProgress";
+import { ArrowRight, Check, LockKeyhole } from "lucide-react";
 import { useViewer } from "@/lib/store/viewer-store";
 import { TopBar } from "@/components/shell/TopBar";
 import { PartsStage } from "@/components/workspace/PartsStage";
@@ -43,42 +49,22 @@ function inferStage(p: Project): Stage {
   return "parts";
 }
 
-function available(p: Project, s: Stage) {
-  switch (s) {
-    case "parts":
-      return true;
-    case "discover":
-      return p.parts.length > 0;
-    case "confirm":
-      return p.parts.length > 0 && !!p.goal;
-    case "engineer":
-      return p.revisions.length > 0;
-    case "export":
-      return p.revisions.length > 0;
-  }
-}
-
-const LABEL: Record<Stage, string> = {
-  parts: "Parts",
-  discover: "Explore",
-  confirm: "Dimensions",
-  engineer: "Design",
-  export: "Print & assemble",
-};
-
 function Studio() {
   const { projectId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate();
   const q = useProject(projectId);
+  const [blocked, setBlocked] = useState<{ reason: string; resolve: Stage } | null>(null);
   const resetViewer = useViewer((s) => s.set);
 
   useEffect(() => {
     resetViewer({ selectedId: null, isolatedId: null, previewRevisionId: null, hidden: {} });
   }, [projectId, resetViewer]);
 
-  const go = (stage: Stage) =>
-    navigate({ to: "/studio/$projectId", params: { projectId }, search: { stage } });
+  const go = (stage: Stage) => {
+    setBlocked(null);
+    void navigate({ to: "/studio/$projectId", params: { projectId }, search: { stage } });
+  };
 
   if (q.isPending)
     return (
@@ -101,55 +87,137 @@ function Studio() {
     );
 
   const p = q.data;
-  const stage = search.stage && available(p, search.stage) ? search.stage : inferStage(p);
-  const confirmedCount = p.parts.filter(partFullyConfirmed).length;
+  const stage = search.stage && stageAccess(p, search.stage).allowed ? search.stage : inferStage(p);
+  const done: Record<Stage, boolean> = {
+    parts: p.parts.length > 0 && p.parts.every((part) => !!part.identityAccepted),
+    discover: !!p.goal,
+    confirm:
+      p.parts.length > 0 &&
+      p.parts
+        .filter(
+          (part) =>
+            !p.selectedConceptId ||
+            p.concepts.find((c) => c.id === p.selectedConceptId)?.partsUsed.includes(part.id),
+        )
+        .every(partFullyConfirmed),
+    engineer: !!p.acceptedRevisionId,
+    export: false,
+  };
+  const usedParts = buildParts(p);
+  const confirmedCount = usedParts.filter(partFullyConfirmed).length;
 
   return (
     <Shell>
-      <div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border/60 px-6 py-2.5 lg:px-9">
-        <span className="max-w-[240px] truncate text-sm text-muted-foreground">{p.name}</span>
-        <nav aria-label="Project stages" className="flex max-w-full gap-1 overflow-x-auto">
+      <div className="shrink-0 px-4 pt-3 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="max-w-full truncate text-sm font-semibold">{p.name}</p>
+          <span className="text-xs text-muted-foreground">
+            {confirmedCount}/{usedParts.length} {p.selectedConceptId ? "used " : ""}parts measured ·
+            draft {p.draftVersion}
+          </span>
+        </div>
+        <nav aria-label="Project stages" className="mt-2 flex gap-2 overflow-x-auto pb-2">
           {STAGES.map((s, i) => {
-            const ok = available(p, s);
+            const access = stageAccess(p, s);
+            const active = stage === s;
             return (
               <button
                 key={s}
-                disabled={!ok}
-                onClick={() => go(s)}
-                aria-current={stage === s ? "step" : undefined}
-                className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-sm px-3 py-1.5 text-[13px] transition-colors disabled:opacity-35 ${stage === s ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                onClick={() => {
+                  if (!access.allowed)
+                    setBlocked({ reason: access.reason!, resolve: access.resolve! });
+                  else go(s);
+                }}
+                aria-current={active ? "step" : undefined}
+                title={access.reason}
+                className={`flex min-h-11 shrink-0 items-center gap-2 rounded-full px-4 text-sm transition-colors ${active ? "bg-accent font-semibold text-primary" : access.allowed ? "text-foreground hover:bg-muted" : "text-muted-foreground hover:bg-muted"}`}
               >
-                <span className={`font-mono text-[11px] ${stage === s ? "text-primary" : ""}`}>
-                  {String(i + 1).padStart(2, "0")}
+                <span
+                  className={`grid size-6 place-items-center rounded-full text-xs ${active ? "bg-primary text-white" : "bg-muted"}`}
+                >
+                  {!access.allowed ? (
+                    <LockKeyhole className="size-3" />
+                  ) : done[s] && !active ? (
+                    <Check className="size-3" />
+                  ) : (
+                    i + 1
+                  )}
                 </span>
-                {LABEL[s]}
+                {STAGE_LABELS[s]}
               </button>
             );
           })}
         </nav>
-        <span className="ml-auto hidden text-xs text-muted-foreground md:block">
-          {confirmedCount}/{p.parts.length} parts confirmed · draft v{p.draftVersion}
-        </span>
-        {stage === "engineer" && (
-          <Btn variant="outline" className="h-8 px-3 text-xs" onClick={() => go("export")}>
-            Print & assemble
-          </Btn>
-        )}
       </div>
-      {stage === "parts" && <PartsStage project={p} startAdding={!!search.add} go={go} />}
-      {stage === "discover" && <DiscoverStage project={p} go={go} />}
-      {stage === "confirm" && <ConfirmStage project={p} go={go} />}
-      {stage === "engineer" && <EngineerStage project={p} />}
-      {stage === "export" && <ExportStage project={p} />}
+      <WorkspaceAssistant key={p.id} project={p} stage={stage}>
+        {(blocked || (search.stage && !stageAccess(p, search.stage).allowed)) && (
+          <div
+            role="status"
+            className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md bg-warning/10 p-4 sm:mx-8"
+          >
+            <p className="text-sm">{blocked?.reason ?? stageAccess(p, search.stage!).reason}</p>
+            <Btn
+              variant="outline"
+              onClick={() => go(blocked?.resolve ?? stageAccess(p, search.stage!).resolve!)}
+            >
+              {STAGE_LABELS[blocked?.resolve ?? stageAccess(p, search.stage!).resolve!]}
+              <ArrowRight className="size-4" />
+            </Btn>
+          </div>
+        )}
+        <AutomaticReferences project={p} />
+        <StageContent project={p} stage={stage} startAdding={!!search.add} go={go} />
+        {p.jobs.length > 0 && (
+          <details className="mx-4 mb-6 border-t border-border pt-4 sm:mx-8">
+            <summary className="text-sm text-muted-foreground">
+              Task history · {p.jobs.length} operations
+            </summary>
+            <div className="mt-4 space-y-4">
+              {[...p.jobs]
+                .sort((a, b) => b.startedAt - a.startedAt)
+                .map((j) => (
+                  <JobProgress key={j.id} job={j} compact />
+                ))}
+            </div>
+          </details>
+        )}
+      </WorkspaceAssistant>
     </Shell>
   );
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="theme-studio-light flex h-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="theme-studio-light flex min-h-screen flex-col bg-background text-foreground">
       <TopBar />
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
     </div>
   );
+}
+
+/** Keep visited steps mounted so unsaved inputs and assistant context survive navigation. */
+function StageContent({
+  project,
+  stage,
+  startAdding,
+  go,
+}: {
+  project: Project;
+  stage: Stage;
+  startAdding: boolean;
+  go: (s: Stage) => void;
+}) {
+  const [visited, setVisited] = useState<Stage[]>([stage]);
+  useEffect(() => {
+    setVisited((previous) => (previous.includes(stage) ? previous : [...previous, stage]));
+  }, [stage]);
+  return [...new Set([...visited, stage])].map((s) => (
+    <div key={s} hidden={s !== stage}>
+      {s === "parts" && <PartsStage project={project} startAdding={startAdding} go={go} />}
+      {s === "discover" && <DiscoverStage project={project} go={go} />}
+      {s === "confirm" && <ConfirmStage project={project} go={go} />}
+      {s === "engineer" && <EngineerStage project={project} go={go} />}
+      {s === "export" && <ExportStage project={project} />}
+    </div>
+  ));
 }

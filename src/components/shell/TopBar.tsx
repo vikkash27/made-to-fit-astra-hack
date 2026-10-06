@@ -26,7 +26,7 @@ export function PreviewBadge() {
     <div
       role="status"
       className="label-mono rounded-sm border border-warning/40 bg-warning/10 px-2 py-1 text-[9.5px] text-warning"
-      title="No backend is configured. Data is sample data; Astra, CAD and Rodin are not called."
+      title="No backend is configured. Data is sample data; recognition, CAD and 3D generation are not called."
     >
       UI preview · sample data · backend disconnected
     </div>
@@ -50,7 +50,7 @@ export function AstraStatus() {
             : !data.astraConfigured
               ? "Not configured"
               : live
-                ? "Configured"
+                ? "Connected"
                 : "Checking";
   return (
     <div className="flex items-center gap-2.5">
@@ -59,7 +59,6 @@ export function AstraStatus() {
         aria-hidden
       />
       <div className="leading-tight">
-        <div className="text-sm">Astra</div>
         <div className="text-[11px] text-muted-foreground">
           {label}
           {data?.mode === "http" && data.ok ? ` · CAD ${data.cad ? "ready" : "unavailable"}` : ""}

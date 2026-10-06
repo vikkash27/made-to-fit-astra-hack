@@ -4,24 +4,30 @@ import type { Job } from "@/lib/domain/types";
 import { jobTiming, formatDuration } from "@/lib/domain/job-timing";
 
 const kinds: Record<Job["kind"], string> = {
-  reference: "Rodin reference",
+  reference: "3D model",
   cad_build: "CAD build",
   checks: "Geometry checks",
   photo_analysis: "Photo analysis",
   evidence: "Specification research",
   concepts: "Project ideas",
   agent: "Astra",
+  wiring: "Wiring plan",
+  dimensions: "Photo dimension estimates",
 };
 const stages: Record<string, string> = {
   queued: "Queued",
-  submitting: "Submitting to Rodin",
-  waiting: "Waiting for Rodin",
+  submitting: "Submitting model request",
+  waiting: "Waiting for model generation",
   generating: "Generating mesh",
   downloading: "Downloading model",
   planning: "Planning",
   building_cad: "Building native CAD",
   analyzing_photo: "Analyzing photo",
+  researching_pinouts: "Reading pinout documentation",
+  planning_connections: "Planning connections",
   researching_specifications: "Checking sources",
+  extracting_specifications: "Reading dimensional evidence",
+  estimating_dimensions: "Estimating likely sizes",
   proposing_concepts: "Developing ideas",
   ready: "Complete",
   failed: "Failed",
@@ -55,11 +61,6 @@ export function JobProgress({ job, compact = false }: { job: Job; compact?: bool
           ? `${timing.active ? "Elapsed" : "Duration"} ${formatDuration(timing.elapsed)}`
           : "Timing unavailable"}
       </p>
-      {timing.active && (
-        <p className="mt-1 text-xs" aria-live="off">
-          {timing.estimate}
-        </p>
-      )}
       {job.error && <p className="mt-1 text-xs">{job.error}</p>}
     </div>
   );

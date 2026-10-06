@@ -1,7 +1,8 @@
+import { checkLabel } from "./check-label";
 import { JobProgress } from "./JobProgress";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Eye, EyeOff, Focus, Lock } from "lucide-react";
+import { Eye, EyeOff, Focus, Lock, Wrench } from "lucide-react";
 import type { EnclosureParams, Project, Revision } from "@/lib/domain/types";
 import { projectKey, useProjectAction } from "@/lib/api/hooks";
 import { getAdapter } from "@/lib/api";
@@ -9,7 +10,7 @@ import { buildAndCheck } from "@/lib/flows-revision";
 import { formatDim } from "@/lib/domain/dimensions";
 import { useViewer } from "@/lib/store/viewer-store";
 import { ViewerPanel } from "@/components/viewer/ViewerPanel";
-import { AstraPanel } from "./AstraPanel";
+import { AskAstra } from "./WorkspaceAssistant";
 import { Btn, ErrorNote, Label, SampleTag, StatusPill } from "./ui";
 
 export function displayRevision(p: Project, previewId: string | null): Revision | null {
@@ -21,20 +22,35 @@ export function displayRevision(p: Project, previewId: string | null): Revision 
   );
 }
 
-export function EngineerStage({ project }: { project: Project }) {
+export function EngineerStage({
+  project,
+  go,
+}: {
+  project: Project;
+  go: (stage: "export") => void;
+}) {
   const v = useViewer();
-  const [tab, setTab] = useState<"astra" | "inspect" | "checks">("astra");
+  const [tab, setTab] = useState<"inspect" | "checks">("checks");
   const rev = displayRevision(project, v.previewRevisionId);
 
   const provenance = rev
-    ? `${rev.label} · ${rev.kind}${rev.sample ? " · preview geometry, not CAD" : ""}${v.previewRevisionId ? " · previewing candidate" : ""}`
+    ? `${rev.label} · ${rev.kind}${rev.sample ? " · preview geometry, not CAD" : !rev.assembly ? " · CAD not built yet" : " · native CAD"}${v.previewRevisionId ? " · previewing candidate" : ""}`
     : "No revision";
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[240px_1fr_380px]">
-        <PartsTree project={project} rev={rev} />
-        <div className="relative min-h-[460px] border-x border-border/60">
+    <div className="p-4 sm:p-8">
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="stage-heading">Build it. Check the fit.</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Inspect the actual CAD, review its checks, then accept the revision you want to print.
+          </p>
+        </div>
+        <AskAstra prompt="Help me review this enclosure before accepting it" />
+      </div>
+      <RevisionStrip project={project} rev={rev} go={go} />
+      <div className="design-layout mt-5 gap-6">
+        <div className="viewer-frame overflow-hidden rounded-lg">
           <ViewerPanel
             parts={rev?.parts ?? project.parts}
             params={rev?.sample ? rev.params : null}
@@ -43,30 +59,37 @@ export function EngineerStage({ project }: { project: Project }) {
             provenance={provenance}
           />
         </div>
-        <aside className="flex min-h-[460px] flex-col">
-          <div role="tablist" className="flex border-b border-border">
-            {(["astra", "inspect", "checks"] as const).map((t) => (
+        <aside className="min-w-0">
+          <div className="flex rounded-full bg-muted p-1" aria-label="Design information">
+            {(["checks", "inspect"] as const).map((t) => (
               <button
                 key={t}
-                role="tab"
-                aria-selected={tab === t}
+                aria-pressed={tab === t}
                 onClick={() => setTab(t)}
-                className={`flex-1 py-3 text-sm capitalize ${tab === t ? "border-b-2 border-primary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`min-h-10 flex-1 rounded-full text-sm font-medium ${tab === t ? "bg-white text-primary" : "text-muted-foreground"}`}
               >
-                {t === "astra" ? "Astra" : t}
+                {t === "checks" ? "Fit checks" : "Part details"}
               </button>
             ))}
           </div>
-          <div className="min-h-0 flex-1">
-            {tab === "astra" && (
-              <AstraPanel project={project} displayRevisionId={rev?.id ?? null} />
-            )}
-            {tab === "inspect" && <Inspect project={project} rev={rev} />}
-            {tab === "checks" && <Checks rev={rev} />}
-          </div>
+          {tab === "checks" ? <Checks rev={rev} /> : <Inspect project={project} rev={rev} />}
+          <Btn
+            variant="outline"
+            className="mt-3 w-full"
+            onClick={() => {
+              v.select("enclosure");
+              setTab("inspect");
+            }}
+          >
+            <Wrench className="size-4" />
+            Adjust enclosure
+          </Btn>
+          <details className="mt-5 border-t border-border pt-4" open>
+            <summary className="text-sm font-medium">Assembly & parts</summary>
+            <PartsTree project={project} rev={rev} />
+          </details>
         </aside>
       </div>
-      <RevisionStrip project={project} rev={rev} />
     </div>
   );
 }
@@ -85,7 +108,7 @@ function PartsTree({ project, rev }: { project: Project; rev: Revision | null })
       <button
         aria-label={`Isolate ${label}`}
         onClick={() => v.isolate(v.isolatedId === id ? null : id)}
-        className="p-1 text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100 focus:opacity-100"
+        className="p-1 text-muted-foreground hover:text-foreground"
       >
         <Focus className="size-3.5" />
       </button>
@@ -99,7 +122,7 @@ function PartsTree({ project, rev }: { project: Project; rev: Revision | null })
     </div>
   );
   return (
-    <aside className="min-h-0 overflow-y-auto px-3 py-4 max-lg:max-h-44">
+    <aside className="px-1 py-4">
       <Label className="mb-2 px-2">Assembly</Label>
       {rev?.assembly
         ? rev.assembly.parts
@@ -146,9 +169,7 @@ function Inspect({ project, rev }: { project: Project; rev: Revision | null }) {
           </div>
         ))}
         {rev.enclosureSize && <p className="font-mono">{rev.enclosureSize.join(" × ")} mm</p>}
-        {rev.id === project.acceptedRevisionId && (
-          <EnclosureEditor key={rev.id} project={project} rev={rev} />
-        )}
+        {!rev.sample && <EnclosureEditor key={rev.id} project={project} rev={rev} />}
         <p className="pt-2 text-xs text-muted-foreground">
           {rev.sample
             ? "Preview envelope computed in the browser — not the CAD solid."
@@ -194,27 +215,56 @@ function Inspect({ project, rev }: { project: Project; rev: Revision | null }) {
 }
 
 function Checks({ rev }: { rev: Revision | null }) {
+  const passed = rev?.checks.filter((c) => c.status === "pass") ?? [];
+  const outstanding = rev?.checks.filter((c) => c.status !== "pass") ?? [];
+  const rows = (checks: Revision["checks"]) =>
+    checks.map((c) => {
+      const label = checkLabel(c);
+      const parts = (c.partIds ?? [])
+        .map(
+          (id) =>
+            rev?.parts?.find((p) => p.id === id)?.label ??
+            ({ base: "Base", lid: "Lid" } as Record<string, string>)[id],
+        )
+        .filter(Boolean);
+      return (
+        <div key={c.id} className="border-t border-border pt-3">
+          <div className="flex items-start justify-between gap-3">
+            <button
+              className="min-w-0 text-left font-medium hover:text-primary"
+              onClick={() => useViewer.getState().select(c.partIds?.[0] ?? null)}
+            >
+              {label}
+              <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                {parts.join(" · ")}
+              </span>
+            </button>
+            <StatusPill status={c.status} />
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            {c.detail} {c.sample && "(sample)"}
+          </p>
+        </div>
+      );
+    });
   return (
     <div className="space-y-3 p-4 text-sm">
       {!rev || rev.checks.length === 0 ? (
         <p className="text-muted-foreground">No checks have run for this revision yet.</p>
       ) : (
-        rev.checks.map((c) => (
-          <div key={c.id} className="border-t border-border pt-2">
-            <div className="flex items-center justify-between">
-              <button
-                className="text-left hover:text-primary"
-                onClick={() => useViewer.getState().select(c.partIds?.[0] ?? null)}
-              >
-                {c.name}
-              </button>
-              <StatusPill status={c.status} />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {c.scope} · {c.detail} {c.sample && "(sample)"}
-            </p>
-          </div>
-        ))
+        <>
+          <p className="font-medium">
+            {passed.length} geometry checks passed
+            {outstanding.some((c) => c.status === "fail") ? " · changes needed" : ""}
+          </p>
+          {outstanding.length > 0 && <div className="space-y-3">{rows(outstanding)}</div>}
+          {passed.length > 0 && (
+            <details className="border-t border-border pt-3">
+              <summary className="font-medium">View {passed.length} passed checks</summary>
+              <div className="mt-3 space-y-3">{rows(passed)}</div>
+            </details>
+          )}
+        </>
       )}
       <p className="rounded-sm border border-border p-2 text-xs text-muted-foreground">
         Coverage: the supported geometry checks listed above. General printability and printer
@@ -225,12 +275,24 @@ function Checks({ rev }: { rev: Revision | null }) {
   );
 }
 
-function RevisionStrip({ project, rev }: { project: Project; rev: Revision | null }) {
+function RevisionStrip({
+  project,
+  rev,
+  go,
+}: {
+  project: Project;
+  rev: Revision | null;
+  go: (stage: "export") => void;
+}) {
   const v = useViewer();
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<unknown>(null);
-  const activeJobs = project.jobs.filter((j) => (j.kind === "cad_build" || j.kind === "checks") && (j.stage === "queued" || j.stage === "running"));
+  const activeJobs = project.jobs.filter(
+    (j) =>
+      (j.kind === "cad_build" || j.kind === "checks") &&
+      (j.stage === "queued" || j.stage === "running"),
+  );
 
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true);
@@ -254,26 +316,41 @@ function RevisionStrip({ project, rev }: { project: Project; rev: Revision | nul
       : rev.eligible === true);
 
   return (
-    <div className="flex flex-wrap items-center gap-3 border-t border-border/70 px-4 py-2.5">
-      <Label>Revisions</Label>
-      <div className="flex gap-1.5 overflow-x-auto">
-        {project.revisions.map((r) => (
-          <button
-            key={r.id}
-            onClick={() =>
-              v.set({ previewRevisionId: r.id === project.acceptedRevisionId ? null : r.id })
-            }
-            className={`shrink-0 rounded-sm border px-2.5 py-1 text-xs ${rev?.id === r.id ? "border-primary" : "border-border hover:border-muted-foreground"}`}
-          >
-            {r.label} · <StatusPill status={r.kind} />
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-wrap items-center gap-3 rounded-lg bg-muted/60 p-4">
+      <span className="text-sm font-medium">
+        {rev?.kind === "accepted"
+          ? "Accepted · ready for print files"
+          : rev?.kind === "failed"
+            ? "Checks failed · adjust the enclosure and try again"
+            : rev?.checks.length
+              ? "Review checks, then accept your design"
+              : "Next: build the CAD and run fit checks"}
+      </span>
+      <details className="max-w-full">
+        <summary className="text-xs text-muted-foreground">Revision history</summary>
+        <div className="mt-3 flex max-w-full flex-wrap gap-2">
+          {project.revisions.map((r) => (
+            <button
+              key={r.id}
+              onClick={() =>
+                v.set({ previewRevisionId: r.id === project.acceptedRevisionId ? null : r.id })
+              }
+              className={`shrink-0 rounded-sm border px-2.5 py-1 text-xs ${rev?.id === r.id ? "border-primary" : "border-border hover:border-muted-foreground"}`}
+            >
+              {r.label} · <StatusPill status={r.kind} />
+            </button>
+          ))}
+        </div>
+      </details>
+      {rev?.id === project.acceptedRevisionId && rev?.kind === "accepted" && (
+        <Btn variant="primary" onClick={() => go("export")}>
+          Print & assemble →
+        </Btn>
+      )}
       {rev && rev.kind !== "accepted" && rev.kind !== "failed" && (
         <Btn
-          variant="outline"
-          className="h-8 px-3 text-xs"
-          disabled={busy}
+          variant="primary"
+          disabled={busy || activeJobs.length > 0}
           onClick={() => run(() => buildAndCheck(rev.id))}
         >
           {busy ? "Working…" : rev.checks.length ? "Rebuild & check" : "Build & check"}
@@ -282,8 +359,8 @@ function RevisionStrip({ project, rev }: { project: Project; rev: Revision | nul
       {canAccept && (
         <Btn
           variant="primary"
-          className="h-8 px-3 text-xs"
-          disabled={busy}
+          className="min-h-11"
+          disabled={busy || activeJobs.length > 0}
           onClick={() =>
             run(() =>
               getAdapter()
@@ -303,9 +380,6 @@ function RevisionStrip({ project, rev }: { project: Project; rev: Revision | nul
         {activeJobs.map((j) => (
           <JobProgress key={j.id} job={j} compact />
         ))}
-        {project.jobs.find((j) => j.stage === "failed") && (
-          <span className="text-xs text-destructive">A job failed</span>
-        )}
       </div>
       {err != null && (
         <div className="w-full">
@@ -327,10 +401,11 @@ function EnclosureEditor({ project, rev }: { project: Project; rev: Revision }) 
   const create = useProjectAction(project.id, (ad) =>
     ad.createCandidate(
       project.id,
-      rev.id,
-      Object.fromEntries(
-        Object.entries(values).map(([k, n]) => [k, Number(n)]),
-      ) as unknown as EnclosureParams,
+      project.acceptedRevisionId,
+      {
+        ...rev.params,
+        ...Object.fromEntries(Object.entries(values).map(([k, n]) => [k, Number(n)])),
+      } as EnclosureParams,
       rev.locks,
     ),
   );

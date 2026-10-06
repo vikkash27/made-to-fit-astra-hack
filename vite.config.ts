@@ -1,15 +1,42 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - TanStack devtools (dev-only, first), tanstackStart, viteReact, tailwindcss, tsConfigPaths,
-//     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
-//     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+// Keep Lovable's React, TanStack, Tailwind and deployment setup as one configuration.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import type { ConfigEnv, PluginOption } from "vite";
 
-export default defineConfig({
-  tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
-  },
+const configure = defineConfig({
+  tanstackStart: { server: { entry: "server" } },
 });
+
+async function protectThreeObjects(option: PluginOption): Promise<PluginOption> {
+  const plugin = await option;
+  if (Array.isArray(plugin)) return Promise.all(plugin.map(protectThreeObjects));
+  if (
+    plugin &&
+    plugin.name === "@tanstack/devtools:inject-source" &&
+    "transform" in plugin &&
+    typeof plugin.transform === "object"
+  ) {
+    // data-tsd-source is a DOM attribute. R3F interprets its dashes as nested object
+    // properties and crashes when a measured mesh updates. Keep source tags on DOM UI.
+    plugin.transform = {
+      ...plugin.transform,
+      filter: {
+        id: {
+          exclude: [
+            /node_modules/,
+            /\?raw/,
+            /\/dist\//,
+            /\/build\//,
+            /\/components\/viewer\/(Viewer|CadScene|ReferenceViewer)\.tsx(?:\?|$)/,
+          ],
+        },
+      },
+    };
+  }
+  return plugin;
+}
+
+export default async (environment: ConfigEnv) => {
+  const config = await configure(environment);
+  config.plugins = await Promise.all((config.plugins ?? []).map(protectThreeObjects));
+  return config;
+};

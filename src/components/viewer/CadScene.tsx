@@ -2,16 +2,9 @@ import { useEffect, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CameraControls, Edges } from "@react-three/drei";
 import { SceneLabel as Html } from "./SceneLabel";
-import {
-  Box3,
-  BufferGeometry,
-  Float32BufferAttribute,
-  Matrix4,
-  Mesh,
-  MeshStandardMaterial,
-  Vector3,
-} from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { Box3, BufferGeometry, Float32BufferAttribute, Matrix4, Vector3 } from "three";
+import { AppearanceMesh } from "./AppearanceMesh";
+import { referencePresentation } from "@/lib/domain/reference-presentation";
 import type {
   AssemblyPartRecord,
   AssemblyRecord,
@@ -173,10 +166,11 @@ function CadPart({
   const enclosure = part.role === "printable_cad";
   const selected = v.selectedId === part.part_id || (enclosure && v.selectedId === "enclosure");
   const lift = v.explode * (part.part_id === "lid" ? 0.055 : enclosure ? 0 : 0.012 + index * 0.009);
-  const reviewed =
-    asset?.calibration.status === "reviewed" &&
-    asset.calibration.aligned_size_mm?.every((n, i) => Math.abs(n - part.size_mm[i]!) < 1e-6);
-  const showVisual = !enclosure && reviewed && v.mode !== "cad";
+  const presentation = useMemo(
+    () => (asset ? referencePresentation(asset, part.size_mm) : null),
+    [asset, part.size_mm],
+  );
+  const showVisual = !enclosure && !!presentation && v.mode !== "cad";
   const showEnvelope =
     enclosure || (v.mode === "cad" ? v.showEnvelopes : !showVisual || v.mode === "overlay");
   return (
@@ -213,7 +207,17 @@ function CadPart({
           </mesh>
         )}
         {showVisual && asset && (
-          <VisualReference asset={asset} selected={selected} partId={part.part_id} />
+          <AppearanceMesh
+            asset={asset}
+            alignment={presentation!.alignment}
+            selected={selected}
+            partId={part.part_id}
+            fallback={
+              <mesh geometry={geometry}>
+                <meshStandardMaterial color="#a38b70" wireframe />
+              </mesh>
+            }
+          />
         )}
         {v.showDims && (selected || (!v.selectedId && part.part_id === "base")) && (
           <Html position={[0, cadSizeToScene(part.size_mm)[1] + 0.004, 0]} zIndexRange={[10, 0]}>
@@ -222,85 +226,14 @@ function CadPart({
             </span>
           </Html>
         )}
-        {!enclosure && asset && !reviewed && v.mode !== "cad" && (
+        {!enclosure && showVisual && !presentation?.reviewed && selected && (
           <Html position={[0, 0, 0]} zIndexRange={[10, 0]}>
             <span className="whitespace-nowrap bg-background/85 px-2 py-1 text-[10px] text-warning">
-              Reference needs alignment review · envelope shown
+              Automatic appearance fit · alignment unreviewed
             </span>
           </Html>
         )}
       </group>
-    </group>
-  );
-}
-function VisualReference({
-  asset,
-  selected,
-  partId,
-}: {
-  asset: VisualAssetRecord;
-  selected: boolean;
-  partId: string;
-}) {
-  const v = useViewer();
-  const loaded = useQuery({
-    queryKey: ["visual-scene", asset.id],
-    staleTime: Infinity,
-    retry: false,
-    queryFn: async () => {
-      const file = asset.preview ?? asset.original;
-      if (!file) throw new Error("Reference preview unavailable.");
-      const gltf = await new GLTFLoader().parseAsync(await artifactData(file.id), "");
-      return gltf.scene;
-    },
-  });
-  const scene = useMemo(() => {
-    if (!loaded.data) return null;
-    const copy = loaded.data.clone(true);
-    copy.traverse((o) => {
-      if (o instanceof Mesh) {
-        const materials = Array.isArray(o.material) ? o.material : [o.material];
-        const clonedMaterials = materials.map((m) => {
-          const clone = m.clone();
-          clone.transparent = v.mode === "overlay";
-          clone.opacity = v.mode === "overlay" ? 0.35 : 1;
-          clone.depthWrite = v.mode !== "overlay";
-          if (selected && clone instanceof MeshStandardMaterial) {
-            clone.emissive.set("#e98254");
-            clone.emissiveIntensity = 0.15;
-          }
-          return clone;
-        });
-        o.material = Array.isArray(o.material) ? clonedMaterials : clonedMaterials[0]!;
-        o.castShadow = true;
-        o.receiveShadow = true;
-      }
-    });
-    return copy;
-  }, [loaded.data, selected, v.mode]);
-  useEffect(
-    () => () => {
-      scene?.traverse((o) => {
-        if (o instanceof Mesh) {
-          (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose());
-        }
-      });
-    },
-    [scene],
-  );
-  if (!scene) return null;
-  const cal = asset.calibration;
-  return (
-    <group
-      scale={cal.uniform_scale ?? 1}
-      position={cal.translation_m ?? [0, 0, 0]}
-      quaternion={cal.rotation_quaternion_xyzw ?? [0, 0, 0, 1]}
-      onClick={(e) => {
-        e.stopPropagation();
-        v.select(partId);
-      }}
-    >
-      <primitive object={scene} />
     </group>
   );
 }

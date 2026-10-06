@@ -52,7 +52,15 @@ class Projects:
         return self.get(data["id"])
 
     def get(self, key):
+        from app.services.dimensions import dimension_basis
+
         p = self.store.get("project", key)
+        component_basis = {c["part_id"]: dimension_basis(c) for c in p["components"]}
+        estimates = {}
+        for record in self.store.all("dimension_estimate", project_id=key):
+            if record["basis_hash"] == component_basis.get(record["part_id"]):
+                estimates[record["part_id"]] = record
+        p["dimension_estimates"] = list(estimates.values())
         p.pop("agent_response_id", None)
         p["revisions"] = [
             {k: r[k] for k in ("id", "parent_id", "state", "spec_hash", "created_at", "diff")}

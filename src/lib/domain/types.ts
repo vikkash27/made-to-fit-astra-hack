@@ -30,11 +30,17 @@ export interface PartAnchor {
 export type PartCategory = "controller" | "display" | "sensor" | "battery" | "other";
 
 export interface Part {
+  dimensionEstimate?: import("@/lib/api/backend-types").DimensionEstimateRecord;
   id: string;
   label: string;
   category: PartCategory;
   identityProposed: string | null;
   identityAccepted: string | null;
+  photoObservations?: {
+    markings: string[];
+    connections: string[];
+    question?: string;
+  };
   status: "proposed" | "accepted";
   photoId?: string;
   anchor?: PartAnchor;
@@ -139,7 +145,16 @@ export interface Revision {
 export type JobStage = "queued" | "running" | "succeeded" | "failed";
 export interface Job {
   id: string;
-  kind: "photo_analysis" | "evidence" | "concepts" | "agent" | "cad_build" | "checks" | "reference";
+  kind:
+    | "photo_analysis"
+    | "evidence"
+    | "concepts"
+    | "agent"
+    | "cad_build"
+    | "checks"
+    | "reference"
+    | "wiring"
+    | "dimensions";
   stage: JobStage;
   backendStage?: string;
   partId?: string | null;

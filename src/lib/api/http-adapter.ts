@@ -3,6 +3,7 @@ import type { Message, Project, Vec3 } from "@/lib/domain/types";
 import type {
   ArtifactRecord,
   ComponentRecord,
+  ComponentProposalRecord,
   ConceptRecord,
   JobRecord,
   ProjectRecord,
@@ -103,10 +104,7 @@ export function createHttpAdapter(
       req<{
         messages: { id: string; role: string; text: string; created_at: string; job_id?: string }[];
       }>("GET", `/projects/${id}/messages`),
-      req<{ proposals: { component: ComponentRecord; stale: boolean; question?: string }[] }>(
-        "GET",
-        `/projects/${id}/component-proposals`,
-      ),
+      req<{ proposals: ComponentProposalRecord[] }>("GET", `/projects/${id}/component-proposals`),
     ]);
     const revisions = records.map(projectRevision);
     const components = [...p.components];
@@ -163,7 +161,13 @@ export function createHttpAdapter(
       allowAdditionalParts: p.preferences.allow_additional_parts as boolean,
       timeBudget: p.preferences.time_budget as string | null,
       stage,
-      parts: components.map(projectPart),
+      parts: components.map((c) => ({
+        ...projectPart(
+          c,
+          proposals.proposals.find((proposal) => proposal.component.part_id === c.part_id),
+        ),
+        dimensionEstimate: p.dimension_estimates?.find((e) => e.part_id === c.part_id),
+      })),
       photos: p.photos.map((ph) => ({ id: ph.id, url: resolve(ph.artifact.url) })),
       concepts: cs.map(projectConcept),
       selectedConceptId: p.selected_concept_id,
@@ -303,6 +307,8 @@ export function createHttpAdapter(
         expected_draft_version: p.draft_version,
       });
     },
+    estimateDimensions: (id, partIds, operationId) =>
+      operation(`/projects/${id}/dimension-estimates`, { part_ids: partIds }, operationId),
     lookupEvidence: async (id, partId, hint) =>
       operation(`/projects/${id}/components/${partId}/lookup`, {
         identifiers: hint || partId,
@@ -388,7 +394,7 @@ export function createHttpAdapter(
             (["x", "y", "z"] as const).every(
               (axis, i) => patch.size?.[axis]?.accept ?? existing?.dimensions_confirmed ?? false,
             );
-          c.dimensions_source = "user_measurement";
+          c.dimensions_source = patch.dimensionsSource ?? "user_measurement";
         }
         components.push(c);
       }
@@ -427,6 +433,7 @@ export function createHttpAdapter(
       const selected = input.context.find((c) => c.startsWith("selection:"))?.slice(10);
       return operation(`/projects/${id}/agent`, {
         message: input.text,
+        current_stage: input.currentStage ?? "parts",
         parent_revision_id: input.parentRevisionId,
         expected_draft_version: p.draft_version,
         selected_part_id: p.components.some((c) => c.part_id === selected) ? selected : null,
@@ -557,7 +564,7 @@ export function createHttpAdapter(
       if (partIds.length !== 1)
         throw new ApiError(
           "single_reference_required",
-          "Choose one photographed component for this paid reference job.",
+          "Choose one reviewed component crop for its 3D appearance model.",
           422,
           false,
         );
@@ -617,6 +624,16 @@ export function createHttpAdapter(
             .map(projectArtifact)
         : [];
     },
+    getWiringPlan: (id) => req("GET", `/revisions/${id}/wiring-plan`),
+    generateWiringPlan: (id, urls) =>
+      operation(`/revisions/${id}/wiring-plan`, { source_urls: urls }),
+    reviewWiringPlan: (id, input) => req("POST", `/revisions/${id}/wiring-plan/review`, input),
+    getGuideProgress: (id) => req("GET", `/revisions/${id}/guide-progress`),
+    saveGuideProgress: (id, ids, planId) =>
+      req("PATCH", `/revisions/${id}/guide-progress`, {
+        completed_step_ids: ids,
+        wiring_plan_id: planId,
+      }),
     getBuildGuide: (id) => req("GET", `/revisions/${id}/build-guide`),
   };
   return adapter;

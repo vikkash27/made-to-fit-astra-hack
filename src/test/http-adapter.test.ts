@@ -48,6 +48,35 @@ describe("Python HTTP boundary", () => {
     expect(part.identityAccepted).toBeNull();
     expect(part.status).toBe("proposed");
   });
+  it("uses the photo identity to prefill type and retains review evidence without accepting it", () => {
+    const c = {
+      ...component,
+      name: "Silver pouch assembly",
+      identity: "Pouch battery; chemistry unconfirmed",
+    };
+    const part = projectPart(c, {
+      component: c,
+      stale: false,
+      visible_markings: ["No readable rating label"],
+      observed_connections: ["Two wires leave the pouch"],
+      question: "Can you show the rating label?",
+    });
+    expect(part.category).toBe("battery");
+    expect(part.identityProposed).toBe(c.identity);
+    expect(part.identityAccepted).toBeNull();
+    expect(part.photoObservations).toEqual({
+      markings: ["No readable rating label"],
+      connections: ["Two wires leave the pouch"],
+      question: "Can you show the rating label?",
+    });
+    expect(part.size.z).toMatchObject({ value: null, status: "unknown" });
+  });
+  it("does not classify a board-mounted connector as a controller", () => {
+    expect(
+      projectPart({ ...component, name: "White connector", identity: "Board-mounted connector" })
+        .category,
+    ).toBe("other");
+  });
   it("understands terminal vendor states without polling forever", () => {
     expect(jobStage("ready")).toBe("succeeded");
     expect(jobStage("unknown_submission")).toBe("failed");

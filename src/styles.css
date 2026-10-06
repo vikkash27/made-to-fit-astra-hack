@@ -8,10 +8,10 @@
   --font-display: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: var(--radius);
-  --radius-xl: 10px;
+  --radius-xl: 20px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -41,17 +41,17 @@
 
 /* Made to Fit — premium physical-product studio. Dark only. */
 :root {
-  --radius: 6px;
-  --background: oklch(0.183 0.004 236);     /* #111315 graphite */
-  --surface: oklch(0.225 0.006 236);        /* #1A1D20 */
+  --radius: 16px;
+  --background: oklch(0.183 0.004 236); /* #111315 graphite */
+  --surface: oklch(0.225 0.006 236); /* #1A1D20 */
   --surface-2: oklch(0.26 0.007 236);
-  --foreground: oklch(0.948 0.009 95);      /* #F1EFE8 ivory */
+  --foreground: oklch(0.948 0.009 95); /* #F1EFE8 ivory */
   --ivory: oklch(0.948 0.009 95);
   --card: oklch(0.225 0.006 236);
   --card-foreground: oklch(0.948 0.009 95);
   --popover: oklch(0.225 0.006 236);
   --popover-foreground: oklch(0.948 0.009 95);
-  --primary: oklch(0.71 0.13 45);           /* #E98254 oxidized orange */
+  --primary: oklch(0.71 0.13 45); /* #E98254 oxidized orange */
   --primary-foreground: oklch(0.18 0.01 45);
   --secondary: oklch(0.26 0.007 236);
   --secondary-foreground: oklch(0.948 0.009 95);
@@ -63,7 +63,7 @@
   --destructive-foreground: oklch(0.98 0 0);
   --success: oklch(0.74 0.11 155);
   --warning: oklch(0.8 0.13 80);
-  --border: oklch(0.335 0.008 230);         /* #34393D hairline */
+  --border: oklch(0.335 0.008 230); /* #34393D hairline */
   --input: oklch(0.335 0.008 230);
   --ring: oklch(0.71 0.13 45);
   --shadow-contact: 0 30px 60px -30px oklch(0 0 0 / 0.7);
@@ -87,7 +87,9 @@
     outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
@@ -104,33 +106,197 @@
 @utility display-tight {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 0.92;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
 }
 
 /* Bright studio theme — applied to project workspace pages. */
 .theme-studio-light {
   color-scheme: light;
-  --background: oklch(0.975 0.006 90);      /* warm paper */
+  --background: #ffffff;
   --surface: oklch(1 0 0);
-  --surface-2: oklch(0.955 0.007 90);
-  --foreground: oklch(0.2 0.006 236);       /* graphite ink */
+  --surface-2: #f5f6f7;
+  --foreground: oklch(0.2 0.006 236); /* graphite ink */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2 0.006 236);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.2 0.006 236);
-  --primary: oklch(0.64 0.15 45);
-  --primary-foreground: oklch(0.99 0.005 90);
-  --secondary: oklch(0.94 0.007 90);
+  --primary: #b9481c;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f5f6;
   --secondary-foreground: oklch(0.2 0.006 236);
-  --muted: oklch(0.94 0.007 90);
+  --muted: #f4f5f6;
   --muted-foreground: oklch(0.48 0.008 230);
-  --accent: oklch(0.92 0.01 80);
+  --accent: #fff1e9;
   --accent-foreground: oklch(0.2 0.006 236);
   --success: oklch(0.52 0.12 155);
   --warning: oklch(0.58 0.13 70);
-  --border: oklch(0.88 0.008 90);
+  --border: #e4e7eb;
   --input: oklch(0.86 0.008 90);
-  --ring: oklch(0.64 0.15 45);
+  --ring: #b9481c;
   --shadow-contact: 0 30px 60px -30px oklch(0.3 0.02 60 / 0.25);
+}
+
+/* Task surfaces share one page scroll; the assistant has its own conversation scroll. */
+.theme-studio-light .label-mono {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.theme-studio-light ::selection {
+  background: #ffe1ce;
+  color: #401c10;
+}
+.theme-studio-light {
+  scrollbar-color: #a6adb5 #fff;
+}
+.theme-studio-light input,
+.theme-studio-light textarea {
+  caret-color: var(--primary);
+}
+.theme-studio-light button,
+.theme-studio-light summary {
+  cursor: pointer;
+}
+.theme-studio-light button:disabled {
+  cursor: not-allowed;
+}
+.workspace-page {
+  container-type: inline-size;
+}
+.stage-heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.parts-layout {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) 340px;
+}
+.parts-photo {
+  min-height: 400px;
+}
+@container (max-width: 850px) {
+  .parts-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .parts-photo {
+    min-height: 300px;
+  }
+}
+.design-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+@container (max-width: 900px) {
+  .design-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.viewer-frame {
+  position: relative;
+  min-height: 520px;
+  height: min(65vh, 720px);
+  background: white;
+}
+@media (max-width: 640px) {
+  .viewer-frame {
+    min-height: 420px;
+    height: 60vh;
+  }
+}
+.assistant-surface {
+  --primary: #b9481c;
+  --primary-foreground: #fff;
+}
+
+.astra-message {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.astra-message > :first-child {
+  margin-top: 0;
+}
+.astra-message p {
+  margin: 0.6em 0;
+}
+.astra-message h3 {
+  margin: 1.2em 0 0.4em;
+  font-size: 16px;
+  font-weight: 600;
+}
+.astra-message ul,
+.astra-message ol {
+  padding-left: 1.35em;
+  margin: 0.7em 0;
+}
+.astra-message ul {
+  list-style: disc;
+}
+.astra-message ol {
+  list-style: decimal;
+}
+.astra-message li {
+  margin: 0.35em 0;
+}
+.astra-message pre {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--muted);
+  padding: 12px;
+  font-size: 12px;
+}
+.astra-message code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--muted);
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+}
+.astra-message pre code {
+  padding: 0;
+}
+.astra-message blockquote {
+  margin: 0.7em 0;
+  padding-left: 12px;
+  border-left: 1px solid var(--input);
+  color: var(--muted-foreground);
+}
+.astra-message th,
+.astra-message td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.landing-page {
+  scrollbar-color: var(--muted-foreground) var(--background);
+}
+.landing-page ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.landing-page input,
+.landing-page textarea {
+  caret-color: var(--primary);
+}
+.landing-page button {
+  cursor: pointer;
+}
+.landing-page button:disabled {
+  cursor: not-allowed;
+}
+.landing-page [role="group"] button {
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out;
+}
+.landing-page .bg-surface span {
+  overflow-wrap: anywhere;
 }

@@ -4,7 +4,62 @@ import { fitReference, suggestReferenceAlignment } from "@/lib/domain/reference-
 import { cadToScene, cadSizeToScene } from "@/lib/domain/units";
 import { latestJob } from "@/lib/domain/job-timing";
 import type { Job, Vec3 } from "@/lib/domain/types";
+import type { VisualAssetRecord } from "@/lib/api/backend-types";
+import { referencePresentation } from "@/lib/domain/reference-presentation";
 describe("Illustrative reference alignment", () => {
+  const asset = {
+    id: "model",
+    part_id: "board",
+    calibration: {
+      status: "needs_review",
+      bounds: [
+        [1, 2, 3],
+        [9, 3, 7],
+      ],
+    },
+  } as VisualAssetRecord;
+  it("shows an unmeasured model at gallery scale without creating dimensions or accepting calibration", () => {
+    const original = structuredClone(asset);
+    const p = referencePresentation(asset, null)!;
+    expect(p.alignment.scale).toBeCloseTo(0.005);
+    expect(p.reviewed).toBe(false);
+    expect(asset).toEqual(original);
+  });
+  it("automatically previews a visual fit and discards stale reviewed sizes", () => {
+    const stale = {
+      ...asset,
+      calibration: {
+        ...asset.calibration,
+        status: "reviewed",
+        aligned_size_mm: [1, 1, 1] as Vec3,
+        uniform_scale: 99,
+        translation_m: [0, 0, 0] as Vec3,
+      },
+    };
+    const p = referencePresentation(stale, [40, 20, 5])!;
+    expect(p.reviewed).toBe(false);
+    expect(p.alignment.scale).toBeLessThan(1);
+    expect(stale.calibration.uniform_scale).toBe(99);
+  });
+  it("retains a reviewed alignment only for the current measured envelope", () => {
+    const reviewed = {
+      ...asset,
+      calibration: {
+        ...asset.calibration,
+        status: "reviewed",
+        aligned_size_mm: [40, 20, 5] as Vec3,
+        uniform_scale: 0.005,
+        translation_m: [0.02, 0.01, -0.02] as Vec3,
+      },
+    };
+    expect(referencePresentation(reviewed, [40, 20, 5])).toMatchObject({
+      reviewed: true,
+      alignment: { scale: 0.005, position: [0.02, 0.01, -0.02] },
+    });
+    expect(
+      referencePresentation({ ...asset, calibration: { status: "needs_review" } }, null),
+    ).toBeNull();
+  });
   it("fits uniformly and centers in the existing renderer frame, never changes CAD dimensions", () => {
     const size: Vec3 = [40, 20, 5];
     const a = fitReference(

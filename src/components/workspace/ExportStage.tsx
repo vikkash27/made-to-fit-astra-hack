@@ -5,6 +5,8 @@ import { Download } from "lucide-react";
 import type { Artifact, Project } from "@/lib/domain/types";
 import { getAdapter } from "@/lib/api";
 import { useProjectAction } from "@/lib/api/hooks";
+import { AskAstra } from "./WorkspaceAssistant";
+import { checkLabel } from "./check-label";
 import { acceptedRevision } from "@/lib/domain/exports";
 import { ReferenceReview } from "./ReferenceReview";
 import { ViewerPanel } from "@/components/viewer/ViewerPanel";
@@ -42,10 +44,7 @@ export function ExportStage({ project }: { project: Project }) {
           className="flex flex-wrap items-center justify-between gap-3 border-t border-border py-3"
         >
           <div>
-            <p>
-              {a.name}
-              {a.partId ? ` · ${a.partId}` : ""}
-            </p>
+            <p>{a.name}</p>
             <p className="font-mono text-xs text-muted-foreground">
               {a.bytes ? `${(a.bytes / 1024).toFixed(1)} KiB` : ""} · {a.sha256?.slice(0, 12)}
             </p>
@@ -53,7 +52,7 @@ export function ExportStage({ project }: { project: Project }) {
           <a
             href={`${ad.resolveArtifactUrl(a.url)}?download=true`}
             download={a.name}
-            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm text-primary-foreground"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
           >
             <Download className="size-4" /> Download {a.name}
           </a>
@@ -66,9 +65,9 @@ export function ExportStage({ project }: { project: Project }) {
     );
   return (
     <div
-      className={`grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[1fr_1fr] ${project.intentMode === "discover" ? "[--primary-foreground:var(--foreground)]" : ""}`}
+      className={`grid grid-cols-1 gap-8 p-4 sm:p-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] `}
     >
-      <div ref={viewerRef} className="min-h-[400px] border-r border-border">
+      <div ref={viewerRef} className="viewer-frame overflow-hidden rounded-lg">
         <ViewerPanel
           parts={rev?.parts ?? project.parts}
           params={rev?.sample ? rev.params : null}
@@ -76,13 +75,13 @@ export function ExportStage({ project }: { project: Project }) {
           visualAssets={project.visualAssets}
           provenance={
             rev
-              ? `${rev.label} · accepted · ${rev.specHash?.slice(0, 12) ?? "sample"}`
+              ? `${rev.label} · accepted${rev.sample ? " · sample" : " · native CAD"}`
               : "No accepted revision"
           }
         />
       </div>
-      <div className="min-h-0 overflow-y-auto px-6 py-8 lg:px-10">
-        <h1 className="display-tight text-5xl">
+      <div className="min-w-0">
+        <h1 className="stage-heading">
           {resource === "assemble" ? "Bring it to life." : "Take it to the printer."}
         </h1>
         <p className="mt-4 text-sm text-muted-foreground">
@@ -99,7 +98,7 @@ export function ExportStage({ project }: { project: Project }) {
             "Build, check and accept a design to unlock its exports."
           )}
         </p>
-        {project.intentMode === "discover" && (
+        {
           <nav aria-label="Build resources" className="mt-5 flex flex-wrap gap-2">
             <Btn
               variant={resource === "print" ? "primary" : "outline"}
@@ -116,7 +115,10 @@ export function ExportStage({ project }: { project: Project }) {
               Assembly guide
             </Btn>
           </nav>
-        )}
+        }
+        <div className="mt-4">
+          <AskAstra prompt="Explain how to print and assemble this accepted enclosure" />
+        </div>
         {resource === "print" && (
           <>
             <section className="mt-8">
@@ -137,13 +139,13 @@ export function ExportStage({ project }: { project: Project }) {
               <Label>Printable CAD · millimetres</Label>
               {rows(printable)}
             </section>
-            <section className="mt-6">
-              <Label>Design record · frozen specification and checks</Label>
-              {rows(records)}
-            </section>
+            <details className="mt-6">
+              <summary className="text-sm font-medium">Design records & checks</summary>
+              <div className="mt-3">{rows(records)}</div>
+            </details>
           </>
         )}
-        {project.intentMode === "discover" && resource === "assemble" && (
+        {resource === "assemble" && (
           <section className="mt-8 border-t border-border pt-5">
             <h2 className="text-2xl font-medium">Put it together.</h2>
             <p className="mt-3 text-sm text-muted-foreground">
@@ -155,6 +157,7 @@ export function ExportStage({ project }: { project: Project }) {
               <BuildGuide
                 key={rev.id}
                 revision={rev}
+                project={project}
                 onShowParts={() => {
                   if (window.matchMedia("(max-width: 1023px)").matches)
                     viewerRef.current?.scrollIntoView({ block: "start" });
@@ -167,18 +170,23 @@ export function ExportStage({ project }: { project: Project }) {
             )}
           </section>
         )}
-        <section className="mt-6">
-          <Label>Visual references · appearance only</Label>
-          {rows(visual)}
-        </section>
+        <details className="mt-6">
+          <summary className="text-sm font-medium">Visual references · optional</summary>
+          <div className="mt-3">
+            <Label>Visual references · appearance only</Label>
+            {rows(visual)}
+          </div>
+        </details>
         <ErrorNote error={exports.error} onRetry={() => exports.refetch()} />
         {rev && (
-          <section className="mt-8 border-t border-border pt-4">
-            <Label>Check coverage</Label>
-            <ul className="mt-3 space-y-1 text-sm">
+          <details className="mt-8 border-t border-border pt-4">
+            <summary className="text-sm font-medium">
+              Check coverage · {rev.checks.filter((c) => c.status === "pass").length} passed
+            </summary>
+            <ul className="mt-3 space-y-2 text-sm">
               {rev.checks.map((c) => (
                 <li key={c.id}>
-                  {c.name} · {c.status}
+                  {checkLabel(c)} · {c.status}
                 </li>
               ))}
             </ul>
@@ -186,64 +194,67 @@ export function ExportStage({ project }: { project: Project }) {
               Electrical, thermal, strength, closure and slicer validation remain outside these
               geometry checks.
             </p>
-          </section>
+          </details>
         )}
-        <section className="mt-8 border-t border-border pt-4">
-          <Label>Optional component reference · paid Rodin job</Label>
-          <p className="my-3 text-sm text-muted-foreground">
-            Choose one reviewed photo crop. Existing jobs and references stay attached to the
-            component.
-          </p>
-          <select
-            aria-label="Reference component"
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            className="mb-3 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm"
-          >
-            <option value="">Choose a photographed part</option>
-            {project.parts
-              .filter((p) => p.photoId)
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
+        <details className="mt-8 border-t border-border pt-4">
+          <summary className="text-sm font-medium">3D appearance & alignment</summary>
+          <div className="mt-4">
+            <Label>Create component 3D models</Label>
+            <p className="my-3 text-sm text-muted-foreground">
+              Choose one reviewed photo crop. Existing jobs and references stay attached to the
+              component.
+            </p>
+            <select
+              aria-label="Reference component"
+              value={selected}
+              onChange={(e) => setSelected(e.target.value)}
+              className="mb-3 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="">Choose a photographed part</option>
+              {project.parts
+                .filter((p) => p.photoId)
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
+                  </option>
+                ))}
+            </select>
+            <Btn
+              variant="outline"
+              disabled={
+                !selected ||
+                reference.isPending ||
+                project.jobs.some(
+                  (j) =>
+                    j.kind === "reference" &&
+                    j.partId === selected &&
+                    (j.stage === "running" ||
+                      j.stage === "queued" ||
+                      j.backendStage === "unknown_submission"),
+                )
+              }
+              onClick={() => reference.mutate([])}
+            >
+              Generate this component reference
+            </Btn>
+            <ErrorNote error={reference.error} />
+            {project.jobs
+              .filter((j) => j.kind === "reference")
+              .map((j) => (
+                <div key={j.id} className="mt-2">
+                  <JobProgress job={j} />
+                </div>
               ))}
-          </select>
-          <Btn
-            variant="outline"
-            disabled={
-              !selected ||
-              reference.isPending ||
-              project.jobs.some(
-                (j) =>
-                  j.kind === "reference" &&
-                  j.partId === selected &&
-                  (j.stage === "running" ||
-                    j.stage === "queued" ||
-                    j.backendStage === "unknown_submission"),
-              )
-            }
-            onClick={() => reference.mutate([])}
-          >
-            Generate this component reference
-          </Btn>
-          <ErrorNote error={reference.error} />
-          {project.jobs
-            .filter((j) => j.kind === "reference")
-            .map((j) => (
-              <div key={j.id} className="mt-2">
-                <JobProgress job={j} />
-              </div>
+            {project.visualAssets?.map((a) => (
+              <ReferenceReview
+                key={a.id}
+                asset={a}
+                projectId={project.id}
+                part={project.parts.find((p) => p.id === a.part_id)}
+              />
             ))}
-          {project.visualAssets?.map((a) => (
-            <ReferenceReview
-              key={a.id}
-              asset={a}
-              projectId={project.id}
-              part={project.parts.find((p) => p.id === a.part_id)}
-            />
-          ))}
-        </section>
+          </div>
+        </details>
       </div>
     </div>
   );

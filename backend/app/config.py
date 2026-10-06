@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     allowed_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
     cad_job_timeout_seconds: int = Field(default=120, ge=1, le=600)
     model_job_timeout_seconds: int = Field(default=180, ge=1, le=600)
+    lookup_job_timeout_seconds: int = Field(default=75, ge=10, le=180)
+    dimension_estimate_timeout_seconds: int = Field(default=60, ge=10, le=180)
     rodin_wait_deadline_seconds: int = Field(default=900, ge=1, le=3600)
     lookup_source_limit: int = Field(default=3, ge=1, le=5)
     max_tool_rounds: int = Field(default=8, ge=1, le=16)

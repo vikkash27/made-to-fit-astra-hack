@@ -26,6 +26,26 @@ export interface ComponentRecord {
   printable_output: false;
   locked_fields: ("pose" | "size_mm")[];
 }
+export interface ComponentProposalRecord {
+  component: ComponentRecord;
+  stale: boolean;
+  visible_markings?: string[];
+  observed_connections?: string[];
+  question?: string;
+}
+export interface DimensionEstimateRecord {
+  id: string;
+  part_id: string;
+  width: EstimatedAxis;
+  depth: EstimatedAxis;
+  height: EstimatedAxis;
+}
+export interface EstimatedAxis {
+  value_mm: number | null;
+  range_mm: [number, number] | null;
+  confidence: "low" | "medium";
+  basis: string;
+}
 export interface EnclosureRecord {
   width_mm: number;
   depth_mm: number;
@@ -133,7 +153,15 @@ export interface JobRecord {
   project_id: string;
   revision_id: string | null;
   part_id?: string | null;
-  kind: "cad_build" | "photo_analysis" | "lookup" | "concept_generation" | "agent" | "visual_asset";
+  kind:
+    | "cad_build"
+    | "photo_analysis"
+    | "lookup"
+    | "concept_generation"
+    | "agent"
+    | "visual_asset"
+    | "wiring_plan"
+    | "dimension_estimation";
   stage: string;
   result?: unknown;
   error: { code: string; message: string; retryable: boolean } | null;
@@ -164,6 +192,7 @@ export interface ConceptRecord {
   geometry_status: string;
 }
 export interface ProjectRecord {
+  dimension_estimates?: DimensionEstimateRecord[];
   id: string;
   name: string;
   goal: string | null;
@@ -231,4 +260,45 @@ export interface BuildGuideRecord {
     requires_review: boolean;
   }[];
   checks: { name: string; status: string; detail: string }[];
+}
+
+export interface WiringEndpoint {
+  part_id: string;
+  pin: string;
+}
+export interface WiringConnection {
+  id: string;
+  start: WiringEndpoint;
+  end: WiringEndpoint;
+  signal: string;
+  kind: "power" | "ground" | "signal";
+  color: "red" | "black" | "yellow" | "blue" | "green" | "white";
+  voltage_v: number;
+  instruction: string;
+  completion_check: string;
+  evidence: { part_id: string; source_id: string; location: string; quote: string }[];
+}
+export interface WiringPlanRecord {
+  id: string;
+  revision_id: string;
+  spec_hash: string;
+  plan_hash: string;
+  status: "needs_review" | "reviewed";
+  overview: string;
+  power_plan: string;
+  connections: WiringConnection[];
+  unresolved: string[];
+  sources: { id: string; title: string; url: string; publisher: string; sha256: string }[];
+  artifacts: ArtifactRecord[];
+}
+export interface WiringState {
+  revision_id: string;
+  spec_hash: string;
+  plan: WiringPlanRecord | null;
+}
+export interface GuideProgressRecord {
+  revision_id: string;
+  spec_hash: string;
+  completed_step_ids: string[];
+  wiring_plan_id?: string | null;
 }

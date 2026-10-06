@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Boxes, Lightbulb } from "lucide-react";
-import { TopBar, AstraStatus } from "@/components/shell/TopBar";
+import { Boxes, Lightbulb, ArrowRight } from "lucide-react";
+import { TopBar } from "@/components/shell/TopBar";
 import { Composer, type ComposerValue } from "@/components/studio/Composer";
 import { startProject } from "@/lib/flows";
 import { errorMessage } from "@/lib/api/hooks";
@@ -11,29 +11,44 @@ import exampleScene from "@/assets/example-scene.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Made to Fit — Your parts. Their next life." },
+      { title: "Made to Fit — Make more of the parts you have." },
       {
         name: "description",
         content:
-          "Find a project in the hardware you have, or bring the one you're already building. Astra helps you design a part that fits.",
+          "Turn your electronics into a useful project, or refine a build already in progress. Review parts, confirm measurements, iterate on an enclosure, then print and assemble.",
       },
-      { property: "og:title", content: "Made to Fit — Your parts. Their next life." },
+      { property: "og:title", content: "Made to Fit — Make more of the parts you have." },
       {
         property: "og:description",
         content:
-          "Photograph your components, discover grounded projects and develop a printable enclosure.",
+          "Discover projects from your electronics, develop an existing idea and iterate on a measured, 3D-printable enclosure with Astra.",
       },
     ],
   }),
   component: Landing,
 });
 
-const LABELS = [
-  { top: "13%", left: "84%", title: "Example scene", sub: "", main: true },
-  { top: "27%", left: "86%", title: "Custom enclosure", sub: "3D printed" },
-  { top: "34%", left: "48%", title: "Display", sub: "Square IPS" },
-  { top: "46%", left: "49%", title: "Main board", sub: "USB-C" },
-  { top: "60%", left: "84%", title: "Battery", sub: "LiPo" },
+const WORKFLOW = [
+  {
+    title: "Review your parts",
+    detail:
+      "Photograph your electronics or add them by hand. Review identities and specs before designing around them.",
+  },
+  {
+    title: "Find a direction",
+    detail:
+      "Explore projects from your inventory, or develop the build you already have. See extra hardware and open decisions.",
+  },
+  {
+    title: "Measure and iterate",
+    detail:
+      "Confirm dimensions, inspect the 3D layout and ask Astra for changes. Build and check each enclosure revision.",
+  },
+  {
+    title: "Print and assemble",
+    detail:
+      "Accept your design, download its STEP, STL or 3MF files, and follow the matching assembly guide.",
+  },
 ];
 
 function Landing() {
@@ -80,6 +95,7 @@ function Landing() {
       await navigate({ to: "/studio/$projectId", params: { projectId: id } });
     } catch (e) {
       setErr(errorMessage(e));
+      throw e;
     } finally {
       setBusy(false);
     }
@@ -87,12 +103,13 @@ function Landing() {
 
   const manual = async () => {
     setBusy(true);
+    setErr(null);
     try {
       const id = await startProject({
         text: "",
         files: [],
         links: [],
-        intent: intent ?? "discover",
+        intent: "discover",
       });
       await navigate({ to: "/studio/$projectId", params: { projectId: id }, search: { add: 1 } });
     } catch (e) {
@@ -102,113 +119,151 @@ function Landing() {
   };
 
   const chip = (active: boolean) =>
-    `flex items-center gap-3 rounded-full border px-6 py-2.5 text-[13px] transition-colors ${active ? "border-primary text-foreground" : "border-border text-foreground/90 hover:border-muted-foreground"}`;
+    `inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm transition-colors disabled:opacity-40 ${active ? "border-primary bg-primary/10 text-foreground" : "border-border text-foreground/90 hover:border-muted-foreground hover:bg-surface"}`;
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <img
-        src={exampleScene}
-        alt="Example scene: an exploded custom enclosure with display, main board and battery"
-        width={1600}
-        height={1008}
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[70%_center] opacity-90"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background via-background/80 to-transparent" />
-
-      <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden>
-        {LABELS.map((l) => (
-          <div key={l.title} className="absolute" style={{ top: l.top, left: l.left }}>
-            <div
-              className={`label-mono ${l.main ? "border-b border-foreground/40 pb-2 text-foreground" : "text-foreground/80"}`}
+    <div className="landing-page min-h-screen">
+      <TopBar />
+      <main>
+        <section
+          aria-labelledby="landing-title"
+          className="relative mx-auto grid max-w-[1600px] gap-8 px-6 pb-10 pt-12 sm:px-10 lg:grid-cols-[1.1fr_1fr] lg:gap-12 lg:px-16 lg:pb-14 lg:pt-16 xl:px-[88px]"
+        >
+          <div className="relative z-10 min-w-0">
+            <h1
+              id="landing-title"
+              className="display-tight max-w-2xl text-[clamp(44px,5.4vw,80px)] [text-wrap:balance]"
             >
-              {l.title}
-            </div>
-            {l.sub && (
-              <div className="label-mono mt-1 text-[9px] text-muted-foreground">{l.sub}</div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="relative flex min-h-screen flex-col">
-        <TopBar />
-        <main className="flex flex-1 flex-col px-6 lg:px-[88px]">
-          <div className="pt-[9vh]">
-            <div className="flex items-center gap-3">
-              <span className="size-3 bg-primary" aria-hidden />
-              <AstraStatus />
-            </div>
-            <p className="mt-2 text-[15px] text-muted-foreground">
-              Start with a photo, a parts list or an idea.
-            </p>
-            <h1 className="display-tight mt-12 text-[clamp(56px,8.4vw,128px)]">
-              Your parts.
+              Make more of
               <br />
-              Their next life.
+              the parts you have.
             </h1>
-            <p className="mt-8 max-w-md text-xl font-light leading-snug text-foreground/80">
-              Find a project in the hardware you have. Or bring the one you’re already building.
+            <p className="mt-6 max-w-[530px] text-lg leading-relaxed text-foreground/80">
+              Turn your electronics into a useful project, or take an existing build further. Plan
+              it with Astra, refine a custom enclosure, then print and put it together.
+            </p>
+
+            <div className="mt-9 max-w-[620px]">
+              <div
+                className="mb-4 flex flex-wrap gap-2"
+                role="group"
+                aria-label="How would you like to start?"
+              >
+                <button
+                  className={chip(intent === "discover")}
+                  disabled={busy}
+                  aria-pressed={intent === "discover"}
+                  onClick={() => setIntent(intent === "discover" ? null : "discover")}
+                >
+                  <Boxes className="size-4" aria-hidden /> Explore my components
+                </button>
+                <button
+                  className={chip(intent === "idea")}
+                  disabled={busy}
+                  aria-pressed={intent === "idea"}
+                  onClick={() => setIntent(intent === "idea" ? null : "idea")}
+                >
+                  <Lightbulb className="size-4" aria-hidden /> I have an idea or project
+                </button>
+              </div>
+              <p className="mb-4 min-h-10 text-sm leading-relaxed text-muted-foreground">
+                {intent === "idea"
+                  ? "Tell us what you’re building and what you want to improve. You can add your parts along the way."
+                  : intent === "discover"
+                    ? "Show us what’s in your parts drawer. We’ll help you find a project worth building."
+                    : "Start with the parts you own, an idea, or a project you’re already working on."}
+              </p>
+              <Composer
+                submitLabel={busy ? "Starting…" : "Start project"}
+                inputLabel={
+                  intent === "idea" ? "Your idea or existing project" : "Your parts or project idea"
+                }
+                size="lg"
+                busy={busy}
+                files={files}
+                onFilesChange={setFiles}
+                placeholder={
+                  intent === "idea"
+                    ? "I’m building a desk sensor and need an enclosure…"
+                    : "I have a controller, a small display and a battery…"
+                }
+                onSubmit={submit}
+              />
+              {err && (
+                <p role="alert" className="mt-3 text-sm text-destructive">
+                  {err}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                <span>Up to 5 photos · JPG, PNG or WebP</span>
+                <button
+                  disabled={busy}
+                  onClick={manual}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm text-foreground hover:bg-accent disabled:opacity-40"
+                >
+                  Add parts by hand <ArrowRight className="size-4" aria-hidden />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <figure className="relative min-w-0 self-stretch overflow-hidden rounded-xl bg-surface lg:-mr-8 xl:-mr-10">
+            <img
+              src={exampleScene}
+              alt="Illustrative exploded enclosure with a display, circuit board and battery between the lid and base"
+              width={1600}
+              height={1008}
+              fetchPriority="high"
+              className="h-[340px] w-full object-cover object-[72%_center] sm:h-[440px] lg:absolute lg:inset-0 lg:h-full lg:object-[73%_center]"
+            />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
+            <figcaption className="absolute inset-x-0 bottom-0 px-6 pb-6">
+              <p className="text-sm font-medium text-foreground">A place for every part.</p>
+              <p className="mt-1 text-xs leading-relaxed text-foreground/80">
+                Example enclosure · illustrative assembly
+              </p>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section aria-labelledby="workflow-title" className="border-t border-border bg-surface/40">
+          <div className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16 xl:px-[88px]">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2
+                id="workflow-title"
+                className="font-display text-[clamp(28px,3vw,40px)] font-semibold leading-tight tracking-[-0.025em]"
+              >
+                From loose parts to a build you can hold.
+              </h2>
+              <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+                One workspace to discover, develop and keep refining your project.
+              </p>
+            </div>
+            <ol className="mt-9 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10">
+              {WORKFLOW.map((step, index) => (
+                <li key={step.title} className="border-t border-border pt-4">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-sm text-primary" aria-hidden>
+                      {index + 1}
+                    </span>
+                    <h3 className="text-base font-medium">{step.title}</h3>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {step.detail}
+                  </p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-9 border-t border-border pt-5 text-xs leading-relaxed text-muted-foreground">
+              Your measurements drive fit. Geometry checks help you review the enclosure; wiring,
+              firmware and slicer settings still need your review before use.
             </p>
           </div>
-
-          <div className="mx-auto mt-auto w-full max-w-[960px] pb-8 pt-12">
-            <div className="mb-6 flex items-center justify-center gap-8">
-              <button
-                className={chip(intent === "idea")}
-                aria-pressed={intent === "idea"}
-                onClick={() => setIntent(intent === "idea" ? null : "idea")}
-              >
-                <Lightbulb className="size-[18px]" /> I have an idea
-              </button>
-              <span className="h-8 w-px bg-border" />
-              <button
-                className={chip(intent === "discover")}
-                aria-pressed={intent === "discover"}
-                onClick={() => setIntent(intent === "discover" ? null : "discover")}
-              >
-                <Boxes className="size-[18px]" /> Explore my components
-              </button>
-            </div>
-            {intent === "discover" && (
-              <p className="mb-5 text-center text-sm text-foreground/80">
-                Photograph your parts → find a useful project → design an enclosure → print and
-                assemble.
-              </p>
-            )}
-            <Composer
-              size="lg"
-              busy={busy}
-              files={files}
-              onFilesChange={setFiles}
-              placeholder={
-                intent === "idea"
-                  ? "Describe what you want to make, or the prototype you have…"
-                  : intent === "discover"
-                    ? "Add a photo or list the parts you have…"
-                    : "Show me your parts, or tell me what you want to make…"
-              }
-              onSubmit={submit}
-            />
-            {err && (
-              <p role="alert" className="mt-3 text-center text-sm text-destructive">
-                {err}
-              </p>
-            )}
-            <div className="label-mono mt-5 flex justify-center gap-4 text-[10px] text-muted-foreground">
-              <span>Drop a photo anywhere</span>·
-              <button className="hover:text-foreground" onClick={manual}>
-                Add parts manually
-              </button>
-              ·<span>Add spec link with the link icon</span>
-            </div>
-          </div>
-        </main>
-      </div>
-
+        </section>
+      </main>
       {dragging && (
-        <div className="pointer-events-none fixed inset-0 z-50 grid place-items-center border-2 border-dashed border-primary bg-background/70">
-          <p className="display-tight text-5xl">Drop your parts photo</p>
+        <div className="pointer-events-none fixed inset-0 z-50 grid place-items-center border-2 border-dashed border-primary bg-background/90 p-6">
+          <p className="display-tight text-center text-4xl">Drop your parts photos</p>
         </div>
       )}
     </div>

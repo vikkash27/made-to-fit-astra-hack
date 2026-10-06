@@ -84,48 +84,51 @@ export function PurposeBrief({
             Still deciding? Leave this blank and explore what your parts could do.
           </p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className="text-sm">
-            Where will it live?
-            <input
-              value={setting}
-              onChange={(e) => setSetting(e.target.value)}
-              placeholder="Desk, wall, outdoors…"
-              className={INPUT}
-            />
-          </label>
-          <label className="text-sm">
-            Your experience
-            <select
-              value={experience ?? ""}
-              onChange={(e) => setExperience((e.target.value || null) as Experience)}
-              className={INPUT}
-            >
-              <option value="">Not sure / skip</option>
-              <option value="first">My first build</option>
-              <option value="some">A few projects</option>
-              <option value="experienced">Experienced</option>
-            </select>
-          </label>
-          <label className="text-sm">
-            Tools you have
-            <input
-              value={tools}
-              onChange={(e) => setTools(e.target.value)}
-              placeholder="3D printer, soldering iron, calipers…"
-              className={INPUT}
-            />
-          </label>
-          <label className="text-sm">
-            Time you want to spend
-            <input
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              placeholder="An afternoon, a weekend…"
-              className={INPUT}
-            />
-          </label>
-        </div>
+        <details>
+          <summary className="text-sm font-medium">Personalise the suggestions · optional</summary>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            <label className="text-sm">
+              Where will it live?
+              <input
+                value={setting}
+                onChange={(e) => setSetting(e.target.value)}
+                placeholder="Desk, wall, outdoors…"
+                className={INPUT}
+              />
+            </label>
+            <label className="text-sm">
+              Your experience
+              <select
+                value={experience ?? ""}
+                onChange={(e) => setExperience((e.target.value || null) as Experience)}
+                className={INPUT}
+              >
+                <option value="">Not sure / skip</option>
+                <option value="first">My first build</option>
+                <option value="some">A few projects</option>
+                <option value="experienced">Experienced</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              Tools you have
+              <input
+                value={tools}
+                onChange={(e) => setTools(e.target.value)}
+                placeholder="3D printer, soldering iron, calipers…"
+                className={INPUT}
+              />
+            </label>
+            <label className="text-sm">
+              Time you want to spend
+              <input
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                placeholder="An afternoon, a weekend…"
+                className={INPUT}
+              />
+            </label>
+          </div>
+        </details>
         <label className="flex cursor-pointer items-start gap-3 text-sm">
           <input
             type="checkbox"

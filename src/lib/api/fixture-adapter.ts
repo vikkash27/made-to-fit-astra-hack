@@ -54,17 +54,43 @@ const wait = (ms = 250) => new Promise((r) => setTimeout(r, ms));
 
 function get(id: string): Project {
   const p = db().projects[id];
-  if (!p) throw new ApiError("not_found", "Project not found in this browser's preview data.", 404, false);
+  if (!p)
+    throw new ApiError(
+      "not_found",
+      "Project not found in this browser's preview data.",
+      404,
+      false,
+    );
   return p;
 }
 
 export const SAMPLE_SOURCES: SourceDoc[] = [
-  { id: "src-pico", title: "Sample datasheet — RP2040 dev board", url: "https://example.com/sample-datasheet", publisher: "Sample" },
-  { id: "src-oled", title: "Sample listing — 0.96in OLED module", url: "https://example.com/sample-listing", publisher: "Sample" },
-  { id: "src-bme", title: "Sample listing — BME280 breakout", url: "https://example.com/sample-listing", publisher: "Sample" },
+  {
+    id: "src-pico",
+    title: "Sample datasheet — RP2040 dev board",
+    url: "https://example.com/sample-datasheet",
+    publisher: "Sample",
+  },
+  {
+    id: "src-oled",
+    title: "Sample listing — 0.96in OLED module",
+    url: "https://example.com/sample-listing",
+    publisher: "Sample",
+  },
+  {
+    id: "src-bme",
+    title: "Sample listing — BME280 breakout",
+    url: "https://example.com/sample-listing",
+    publisher: "Sample",
+  },
 ];
 
-const DEFAULT_PARAMS: EnclosureParams = { wall: 2, clearance: 1.5, lidThickness: 2, cornerRadius: 4 };
+const DEFAULT_PARAMS: EnclosureParams = {
+  wall: 2,
+  clearance: 1.5,
+  lidThickness: 2,
+  cornerRadius: 4,
+};
 
 function unknown() {
   return { value: null, status: "unknown" as const };
@@ -73,24 +99,61 @@ function unknown() {
 function sampleParts(photoId: string): Part[] {
   return [
     {
-      id: "part-controller", label: "Controller", category: "controller", identityProposed: "RP2040 dev board (Pico-class)",
-      identityAccepted: null, status: "proposed", photoId, anchor: { x: 0.145, y: 0.14, w: 0.145, h: 0.43 },
-      size: unknown3(), pose: [0, 0, 4], visible: true, sample: true,
+      id: "part-controller",
+      label: "Controller",
+      category: "controller",
+      identityProposed: "RP2040 dev board (Pico-class)",
+      identityAccepted: null,
+      status: "proposed",
+      photoId,
+      anchor: { x: 0.145, y: 0.14, w: 0.145, h: 0.43 },
+      size: unknown3(),
+      pose: [0, 0, 4],
+      visible: true,
+      sample: true,
     },
     {
-      id: "part-display", label: "Display", category: "display", identityProposed: "0.96in OLED 128×64, I²C",
-      identityAccepted: null, status: "proposed", photoId, anchor: { x: 0.36, y: 0.17, w: 0.2, h: 0.31 },
-      size: unknown3(), pose: [27, 0, 4], visible: true, sample: true,
+      id: "part-display",
+      label: "Display",
+      category: "display",
+      identityProposed: "0.96in OLED 128×64, I²C",
+      identityAccepted: null,
+      status: "proposed",
+      photoId,
+      anchor: { x: 0.36, y: 0.17, w: 0.2, h: 0.31 },
+      size: unknown3(),
+      pose: [27, 0, 4],
+      visible: true,
+      sample: true,
     },
     {
-      id: "part-sensor", label: "Temperature sensor", category: "sensor", identityProposed: "BME280 breakout",
-      identityAccepted: null, status: "proposed", photoId, anchor: { x: 0.28, y: 0.6, w: 0.11, h: 0.18 },
-      size: unknown3(), pose: [27, 31, 4], visible: true, sample: true,
+      id: "part-sensor",
+      label: "Temperature sensor",
+      category: "sensor",
+      identityProposed: "BME280 breakout",
+      identityAccepted: null,
+      status: "proposed",
+      photoId,
+      anchor: { x: 0.28, y: 0.6, w: 0.11, h: 0.18 },
+      size: unknown3(),
+      pose: [27, 31, 4],
+      visible: true,
+      sample: true,
     },
     {
-      id: "part-battery", label: "Battery", category: "battery", identityProposed: "LiPo pouch, 503450-class (unverified)",
-      identityAccepted: null, status: "proposed", photoId, anchor: { x: 0.63, y: 0.27, w: 0.17, h: 0.45 },
-      size: unknown3(), pose: [0, 54, 4], visible: true, sample: true, needsAttention: "Identity needs confirmation",
+      id: "part-battery",
+      label: "Battery",
+      category: "battery",
+      identityProposed: "LiPo pouch, 503450-class (unverified)",
+      identityAccepted: null,
+      status: "proposed",
+      photoId,
+      anchor: { x: 0.63, y: 0.27, w: 0.17, h: 0.45 },
+      size: unknown3(),
+      pose: [0, 54, 4],
+      visible: true,
+      sample: true,
+      needsAttention: "Identity needs confirmation",
     },
   ];
 }
@@ -101,57 +164,115 @@ function unknown3() {
 const SAMPLE_EVIDENCE: Record<string, Omit<Evidence, "partId">> = {
   "part-controller": {
     candidates: [{ identity: "RP2040 dev board (Pico-class)", confidence: 0.7 }],
-    proposals: [{ field: "x", value: 21, sourceId: "src-pico" }, { field: "y", value: 51, sourceId: "src-pico" }, { field: "z", value: 3.9, sourceId: "src-pico" }],
-    sources: [SAMPLE_SOURCES[0]!], missing: [], sample: true,
+    proposals: [
+      { field: "x", value: 21, sourceId: "src-pico" },
+      { field: "y", value: 51, sourceId: "src-pico" },
+      { field: "z", value: 3.9, sourceId: "src-pico" },
+    ],
+    sources: [SAMPLE_SOURCES[0]!],
+    missing: [],
+    sample: true,
   },
   "part-display": {
     candidates: [{ identity: "0.96in OLED 128×64, I²C", confidence: 0.6 }],
-    proposals: [{ field: "x", value: 27.3, sourceId: "src-oled" }, { field: "y", value: 27.8, sourceId: "src-oled" }],
-    sources: [SAMPLE_SOURCES[1]!], missing: ["z"], sample: true,
+    proposals: [
+      { field: "x", value: 27.3, sourceId: "src-oled" },
+      { field: "y", value: 27.8, sourceId: "src-oled" },
+    ],
+    sources: [SAMPLE_SOURCES[1]!],
+    missing: ["z"],
+    sample: true,
   },
   "part-sensor": {
     candidates: [{ identity: "BME280 breakout", confidence: 0.65 }],
-    proposals: [{ field: "x", value: 15, sourceId: "src-bme" }, { field: "y", value: 12, sourceId: "src-bme" }],
-    sources: [SAMPLE_SOURCES[2]!], missing: ["z"], sample: true,
+    proposals: [
+      { field: "x", value: 15, sourceId: "src-bme" },
+      { field: "y", value: 12, sourceId: "src-bme" },
+    ],
+    sources: [SAMPLE_SOURCES[2]!],
+    missing: ["z"],
+    sample: true,
   },
   "part-battery": {
     candidates: [{ identity: "LiPo pouch, 503450-class", confidence: 0.4 }],
-    proposals: [], sources: [], missing: ["x", "y", "z"], sample: true,
+    proposals: [],
+    sources: [],
+    missing: ["x", "y", "z"],
+    sample: true,
   },
 };
 
 function sampleConcepts(p: Project, refinement?: string): Concept[] {
   const used = p.parts.map((x) => x.label);
   const base = {
-    partsUsed: used, partsUnused: [] as string[], sample: true,
+    partsUsed: used,
+    partsUnused: [] as string[],
+    sample: true,
     skills: ["Soldering headers", "Flashing firmware", "Basic wiring"],
   };
   const forYou =
-    p.experience === "experienced" ? "Skips beginner steps; leaves room for your own firmware." : "A contained first build: one board, one bus, a single enclosure.";
+    p.experience === "experienced"
+      ? "Skips beginner steps; leaves room for your own firmware."
+      : "A contained first build: one board, one bus, a single enclosure.";
   const list: Concept[] = [
     {
-      ...base, id: "concept-desk", title: "Desk temperature station", formFactor: "Angled desk station",
+      ...base,
+      id: "concept-desk",
+      title: "Desk temperature station",
+      formFactor: "Angled desk station",
       purpose: "Shows room temperature, humidity and pressure at a glance on your desk.",
-      additionalNeeded: ["Jumper wires", "USB-C cable", "LiPo charger if battery is used", "Firmware (MicroPython or Arduino)"],
-      whyForYou: forYou, difficulty: "beginner",
-      uncertainties: ["Battery identity unconfirmed", "Display module height unknown", "Sensor self-heating near controller"],
-      nextMeasurements: ["Display module thickness incl. header", "Battery length × width × thickness", "Sensor board thickness"],
-      buildPath: ["Verify parts", "Breadboard prototype", "CAD enclosure", "Assemble"], previewImage: conceptDesk,
+      additionalNeeded: [
+        "Jumper wires",
+        "USB-C cable",
+        "LiPo charger if battery is used",
+        "Firmware (MicroPython or Arduino)",
+      ],
+      whyForYou: forYou,
+      difficulty: "beginner",
+      uncertainties: [
+        "Battery identity unconfirmed",
+        "Display module height unknown",
+        "Sensor self-heating near controller",
+      ],
+      nextMeasurements: [
+        "Display module thickness incl. header",
+        "Battery length × width × thickness",
+        "Sensor board thickness",
+      ],
+      buildPath: ["Verify parts", "Breadboard prototype", "CAD enclosure", "Assemble"],
+      previewImage: conceptDesk,
     },
     {
-      ...base, id: "concept-wall", title: "Wall climate monitor", formFactor: "Low-profile wall mount",
+      ...base,
+      id: "concept-wall",
+      title: "Wall climate monitor",
+      formFactor: "Low-profile wall mount",
       purpose: "A flat monitor for any room, mounted with screws or adhesive.",
-      additionalNeeded: ["Wall fixings", "Jumper wires", "Firmware"], whyForYou: forYou, difficulty: "beginner",
+      additionalNeeded: ["Wall fixings", "Jumper wires", "Firmware"],
+      whyForYou: forYou,
+      difficulty: "beginner",
       uncertainties: ["Wall mounting method", "Airflow to sensor in a flat case"],
-      nextMeasurements: ["Display module thickness", "Battery thickness"], buildPath: ["Verify parts", "Prototype", "CAD", "Mount"],
+      nextMeasurements: ["Display module thickness", "Battery thickness"],
+      buildPath: ["Verify parts", "Prototype", "CAD", "Mount"],
       previewImage: conceptWall,
     },
     {
-      ...base, id: "concept-portable", title: "Portable climate tag", formFactor: "Handheld with strap",
+      ...base,
+      id: "concept-portable",
+      title: "Portable climate tag",
+      formFactor: "Handheld with strap",
       purpose: "Carry it between rooms or outdoors; battery powered.",
-      additionalNeeded: ["LiPo charger module", "Power switch", "Strap", "Firmware with sleep mode"], whyForYou: forYou,
-      difficulty: "intermediate", uncertainties: ["Battery identity and protection circuit", "Runtime unknown"],
-      nextMeasurements: ["Battery dimensions", "Switch footprint"], buildPath: ["Verify battery", "Prototype", "CAD", "Assemble"],
+      additionalNeeded: [
+        "LiPo charger module",
+        "Power switch",
+        "Strap",
+        "Firmware with sleep mode",
+      ],
+      whyForYou: forYou,
+      difficulty: "intermediate",
+      uncertainties: ["Battery identity and protection circuit", "Runtime unknown"],
+      nextMeasurements: ["Battery dimensions", "Switch footprint"],
+      buildPath: ["Verify battery", "Prototype", "CAD", "Assemble"],
       previewImage: conceptPortable,
     },
   ];
@@ -167,28 +288,69 @@ function msg(role: Message["role"], text: string, extra: Partial<Message> = {}):
 function computeSampleChecks(params: EnclosureParams): Check[] {
   return [
     {
-      id: "chk-clear", name: "Envelope clearance ≥ 1.0 mm", scope: "fit",
-      status: params.clearance >= 1 ? "pass" : "fail", detail: `Preview clearance ${params.clearance} mm (computed on preview envelopes, not CAD solids).`, sample: true,
+      id: "chk-clear",
+      name: "Envelope clearance ≥ 1.0 mm",
+      scope: "fit",
+      status: params.clearance >= 1 ? "pass" : "fail",
+      detail: `Preview clearance ${params.clearance} mm (computed on preview envelopes, not CAD solids).`,
+      sample: true,
     },
     {
-      id: "chk-wall", name: "Wall thickness ≥ 1.2 mm (FDM)", scope: "printability",
-      status: params.wall >= 1.2 ? "pass" : "fail", detail: `Preview wall ${params.wall} mm.`, sample: true,
+      id: "chk-wall",
+      name: "Wall thickness ≥ 1.2 mm (FDM)",
+      scope: "printability",
+      status: params.wall >= 1.2 ? "pass" : "fail",
+      detail: `Preview wall ${params.wall} mm.`,
+      sample: true,
     },
-    { id: "chk-lid", name: "Lid seating / fastener fit", scope: "mechanical", status: "unverified", detail: "Requires CAD solids from the backend.", sample: true },
+    {
+      id: "chk-lid",
+      name: "Lid seating / fastener fit",
+      scope: "mechanical",
+      status: "unverified",
+      detail: "Requires CAD solids from the backend.",
+      sample: true,
+    },
   ];
 }
 
-function newJob(p: Project, kind: Job["kind"], apply: string, payload?: unknown, revisionId?: string) {
+function newJob(
+  p: Project,
+  kind: Job["kind"],
+  apply: string,
+  payload?: unknown,
+  revisionId?: string,
+) {
   const id = uid("job");
-  db().jobs[id] = { job_id: id, kind, stage: "queued", project_id: p.id, revision_id: revisionId ?? null, startedAt: now(), apply, payload, error: null };
-  p.jobs = [{ id, kind, stage: "queued" as const, label: jobLabel(kind), startedAt: now(), revisionId }, ...p.jobs].slice(0, 20);
+  db().jobs[id] = {
+    job_id: id,
+    kind,
+    stage: "queued",
+    project_id: p.id,
+    revision_id: revisionId ?? null,
+    startedAt: now(),
+    apply,
+    payload,
+    error: null,
+  };
+  p.jobs = [
+    { id, kind, stage: "queued" as const, label: jobLabel(kind), startedAt: now(), revisionId },
+    ...p.jobs,
+  ].slice(0, 20);
   save();
   return { job_id: id };
 }
 function jobLabel(k: Job["kind"]) {
   return {
-    photo_analysis: "Sample photo analysis", evidence: "Sample spec lookup", concepts: "Sample concepts",
-    agent: "Sample Astra reply", cad_build: "Preview build (not CAD)", checks: "Preview checks", reference: "Reference model",
+    photo_analysis: "Sample photo analysis",
+    evidence: "Sample spec lookup",
+    concepts: "Sample concepts",
+    agent: "Sample Astra reply",
+    cad_build: "Preview build (not CAD)",
+    checks: "Preview checks",
+    wiring: "Wiring plan",
+    dimensions: "Photo dimension estimates",
+    reference: "Reference model",
   }[k];
 }
 
@@ -208,7 +370,10 @@ function applyJob(j: Db["jobs"][string]) {
       const photoId = (j.payload as { photoId: string }).photoId;
       if (!p.parts.some((x) => x.sample)) p.parts.push(...sampleParts(photoId));
       p.messages.push(
-        msg("astra", "Sample identification — the backend is disconnected, so these four parts are illustrative and were not recognized from your photo. Correct or replace them, or connect the backend for real analysis."),
+        msg(
+          "astra",
+          "Sample identification — the backend is disconnected, so these four parts are illustrative and were not recognized from your photo. Correct or replace them, or connect the backend for real analysis.",
+        ),
       );
       break;
     }
@@ -218,7 +383,8 @@ function applyJob(j: Db["jobs"][string]) {
       const ev = SAMPLE_EVIDENCE[partId];
       if (part && ev) {
         for (const pr of ev.proposals) {
-          if (part.size[pr.field].status !== "accepted") part.size[pr.field] = { value: pr.value, status: "proposed", sourceId: pr.sourceId };
+          if (part.size[pr.field].status !== "accepted")
+            part.size[pr.field] = { value: pr.value, status: "proposed", sourceId: pr.sourceId };
         }
       }
       break;
@@ -228,37 +394,95 @@ function applyJob(j: Db["jobs"][string]) {
       if (p.stage === "parts") p.stage = "discover";
       break;
     case "agent": {
-      const { text, parentRevisionId } = j.payload as { text: string; parentRevisionId: string | null };
-      const parent = p.revisions.find((r) => r.id === parentRevisionId) ?? p.revisions[p.revisions.length - 1];
+      const { text, parentRevisionId } = j.payload as {
+        text: string;
+        parentRevisionId: string | null;
+      };
+      const parent =
+        p.revisions.find((r) => r.id === parentRevisionId) ?? p.revisions[p.revisions.length - 1];
       const t = text.toLowerCase();
       const diff: { field: keyof EnclosureParams; from: number; to: number }[] = [];
       if (parent) {
-        if (/tall|height|room|clearance/.test(t)) diff.push({ field: "clearance", from: parent.params.clearance, to: +(parent.params.clearance + 2).toFixed(1) });
-        if (/thick|wall|strong|sturd/.test(t)) diff.push({ field: "wall", from: parent.params.wall, to: +(parent.params.wall + 0.6).toFixed(1) });
-        if (/round|soft|corner/.test(t)) diff.push({ field: "cornerRadius", from: parent.params.cornerRadius, to: parent.params.cornerRadius + 2 });
-        if (/thin|slim|small/.test(t)) diff.push({ field: "wall", from: parent.params.wall, to: Math.max(1, +(parent.params.wall - 0.4).toFixed(1)) });
+        if (/tall|height|room|clearance/.test(t))
+          diff.push({
+            field: "clearance",
+            from: parent.params.clearance,
+            to: +(parent.params.clearance + 2).toFixed(1),
+          });
+        if (/thick|wall|strong|sturd/.test(t))
+          diff.push({
+            field: "wall",
+            from: parent.params.wall,
+            to: +(parent.params.wall + 0.6).toFixed(1),
+          });
+        if (/round|soft|corner/.test(t))
+          diff.push({
+            field: "cornerRadius",
+            from: parent.params.cornerRadius,
+            to: parent.params.cornerRadius + 2,
+          });
+        if (/thin|slim|small/.test(t))
+          diff.push({
+            field: "wall",
+            from: parent.params.wall,
+            to: Math.max(1, +(parent.params.wall - 0.4).toFixed(1)),
+          });
       }
       if (diff.length && parent) {
         const params = { ...parent.params };
         for (const d of diff) params[d.field] = d.to;
         const cand: Revision = {
-          id: uid("rev"), label: `Candidate ${p.revisions.length}`, kind: "candidate", parentId: parent.id, params,
-          locks: parent.locks, checks: [], artifacts: [], createdAt: now(), sample: true, note: text,
+          id: uid("rev"),
+          label: `Candidate ${p.revisions.length}`,
+          kind: "candidate",
+          parentId: parent.id,
+          params,
+          locks: parent.locks,
+          checks: [],
+          artifacts: [],
+          createdAt: now(),
+          sample: true,
+          note: text,
         };
         p.revisions.push(cand);
         p.candidateRevisionId = cand.id;
         p.messages.push(
-          msg("astra", "Sample reply (not live Astra). Here is a proposed parameter change. It is not applied until it is built, checked and you accept it.", {
-            cards: [{ type: "change", summary: text, diff, preservedLocks: parent.locks, candidateId: cand.id }],
-          }),
+          msg(
+            "astra",
+            "Sample reply (not live Astra). Here is a proposed parameter change. It is not applied until it is built, checked and you accept it.",
+            {
+              cards: [
+                {
+                  type: "change",
+                  summary: text,
+                  diff,
+                  preservedLocks: parent.locks,
+                  candidateId: cand.id,
+                },
+              ],
+            },
+          ),
         );
       } else {
         const missing = p.parts.find((x) => x.size.z.value == null);
         p.messages.push(
-          msg("astra", parent
-            ? "Sample reply (not live Astra). In preview mode I can only demonstrate wall, clearance and corner changes — try “make it taller” or “thicker walls”."
-            : "Sample reply (not live Astra). Confirm part dimensions first so a draft layout can be created.",
-            missing ? { cards: [{ type: "measurement", partId: missing.id, field: "z", prompt: `What is the ${missing.label.toLowerCase()} thickness in mm?` }] } : {},
+          msg(
+            "astra",
+            parent
+              ? "Sample reply (not live Astra). In preview mode I can only demonstrate wall, clearance and corner changes — try “make it taller” or “thicker walls”."
+              : "Sample reply (not live Astra). Confirm part dimensions first so a draft layout can be created.",
+            missing
+              ? {
+                  cards: [
+                    {
+                      type: "measurement",
+                      partId: missing.id,
+                      field: "z",
+                      prompt: `What is the ${missing.label.toLowerCase()} thickness in mm?`,
+                    },
+                  ],
+                }
+              : {},
           ),
         );
       }
@@ -283,7 +507,13 @@ export function createFixtureAdapter(): BackendAdapter {
   return {
     mode: "fixture",
     async health() {
-      return { ok: false, cad: false, astraConfigured: false, rodinConfigured: false, mode: "fixture" };
+      return {
+        ok: false,
+        cad: false,
+        astraConfigured: false,
+        rodinConfigured: false,
+        mode: "fixture",
+      };
     },
     async listProjects() {
       return Object.values(db().projects)
@@ -293,9 +523,25 @@ export function createFixtureAdapter(): BackendAdapter {
     async createProject(input) {
       await wait();
       const p: Project = {
-        id: uid("proj"), name: input.name, intentMode: input.intentMode, goal: input.goal, experience: null, tools: null,
-        constraints: [], stage: "parts", photos: [], parts: [], concepts: [], selectedConceptId: null, revisions: [],
-        acceptedRevisionId: null, candidateRevisionId: null, jobs: [], messages: [], draftVersion: 1, createdAt: now(),
+        id: uid("proj"),
+        name: input.name,
+        intentMode: input.intentMode,
+        goal: input.goal,
+        experience: null,
+        tools: null,
+        constraints: [],
+        stage: "parts",
+        photos: [],
+        parts: [],
+        concepts: [],
+        selectedConceptId: null,
+        revisions: [],
+        acceptedRevisionId: null,
+        candidateRevisionId: null,
+        jobs: [],
+        messages: [],
+        draftVersion: 1,
+        createdAt: now(),
       };
       if (input.initialText) p.messages.push(msg("user", input.initialText));
       db().projects[p.id] = p;
@@ -321,9 +567,14 @@ export function createFixtureAdapter(): BackendAdapter {
     },
     async updatePreferences(id, prefs) {
       const p = get(id);
-      Object.assign(p, Object.fromEntries(Object.entries(prefs).filter(([, v]) => v !== undefined)));
+      Object.assign(
+        p,
+        Object.fromEntries(Object.entries(prefs).filter(([, v]) => v !== undefined)),
+      );
       p.draftVersion++;
-      p.concepts.forEach((c) => { c.stale = true; });
+      p.concepts.forEach((c) => {
+        c.stale = true;
+      });
       save();
       return structuredClone(p);
     },
@@ -343,20 +594,43 @@ export function createFixtureAdapter(): BackendAdapter {
     },
     async getEvidence(_projectId, partId) {
       const ev = SAMPLE_EVIDENCE[partId];
-      return ev ? { partId, ...ev } : { partId, candidates: [], proposals: [], sources: [], missing: ["x", "y", "z"], sample: true };
+      return ev
+        ? { partId, ...ev }
+        : {
+            partId,
+            candidates: [],
+            proposals: [],
+            sources: [],
+            missing: ["x", "y", "z"],
+            sample: true,
+          };
     },
     async confirmComponents(projectId, draftVersion, patches) {
       const p = get(projectId);
-      if (draftVersion !== p.draftVersion) throw new ApiError("stale_draft", "Project changed elsewhere — reloaded latest.", 409, true);
+      if (draftVersion !== p.draftVersion)
+        throw new ApiError(
+          "stale_draft",
+          "Project changed elsewhere — reloaded latest.",
+          409,
+          true,
+        );
       for (const pt of patches) applyPartPatch(p, pt);
       p.draftVersion++;
-      p.concepts.forEach((c) => { c.stale = true; });
+      p.concepts.forEach((c) => {
+        c.stale = true;
+      });
       save();
       return structuredClone(p);
     },
     async generateConcepts(projectId, _v, refinement) {
       const p = get(projectId);
-      if (p.parts.length === 0) throw new ApiError("no_inventory", "Add at least one part before exploring concepts.", 422, false);
+      if (p.parts.length === 0)
+        throw new ApiError(
+          "no_inventory",
+          "Add at least one part before exploring concepts.",
+          422,
+          false,
+        );
       return newJob(p, "concepts", "concepts", { refinement });
     },
     async listConcepts(projectId) {
@@ -366,7 +640,13 @@ export function createFixtureAdapter(): BackendAdapter {
       const p = get(projectId);
       const c = p.concepts.find((x) => x.id === conceptId);
       if (!c) throw new ApiError("not_found", "Unknown concept.", 404, false);
-      if (c.stale) throw new ApiError("stale_draft", "Your parts or brief changed. Find projects again.", 409, false);
+      if (c.stale)
+        throw new ApiError(
+          "stale_draft",
+          "Your parts or brief changed. Find projects again.",
+          409,
+          false,
+        );
       p.selectedConceptId = conceptId;
       p.goal = c.title;
       p.stage = "confirm";
@@ -383,8 +663,16 @@ export function createFixtureAdapter(): BackendAdapter {
       const p = get(projectId);
       const kind = p.revisions.length === 0 ? "draft" : "candidate";
       const r: Revision = {
-        id: uid("rev"), label: kind === "draft" ? "Draft" : `Candidate ${p.revisions.length}`, kind, parentId, params, locks,
-        checks: [], artifacts: [], createdAt: now(), sample: true,
+        id: uid("rev"),
+        label: kind === "draft" ? "Draft" : `Candidate ${p.revisions.length}`,
+        kind,
+        parentId,
+        params,
+        locks,
+        checks: [],
+        artifacts: [],
+        createdAt: now(),
+        sample: true,
       };
       p.revisions.push(r);
       if (kind === "candidate") p.candidateRevisionId = r.id;
@@ -409,12 +697,27 @@ export function createFixtureAdapter(): BackendAdapter {
       r.kind = "accepted";
       p.acceptedRevisionId = r.id;
       if (p.candidateRevisionId === r.id) p.candidateRevisionId = null;
-      for (const m of p.messages) for (const c of m.cards ?? []) if (c.type === "change" && c.candidateId === r.id) c.resolved = "applied";
+      for (const m of p.messages)
+        for (const c of m.cards ?? [])
+          if (c.type === "change" && c.candidateId === r.id) c.resolved = "applied";
       save();
       return structuredClone(r);
     },
+    async estimateDimensions() {
+      throw new ApiError(
+        "backend_disconnected",
+        "Photo estimates require the live backend.",
+        503,
+        false,
+      );
+    },
     async generateReference() {
-      throw new ApiError("backend_disconnected", "Reference models need the live backend (Rodin). Nothing was generated or charged.", 503, false);
+      throw new ApiError(
+        "backend_disconnected",
+        "Reference models need the live backend (Rodin). Nothing was generated or charged.",
+        503,
+        false,
+      );
     },
     async getJob(jobId) {
       const j = db().jobs[jobId];
@@ -426,8 +729,38 @@ export function createFixtureAdapter(): BackendAdapter {
     async getExports() {
       return [];
     },
+    async getWiringPlan() {
+      throw new ApiError("sample_only", "Connect the backend for a real wiring plan.", 422, false);
+    },
+    async generateWiringPlan() {
+      throw new ApiError("sample_only", "Connect the backend for pinout research.", 422, false);
+    },
+    async reviewWiringPlan() {
+      throw new ApiError("sample_only", "Sample wiring cannot be reviewed.", 422, false);
+    },
+    async getGuideProgress() {
+      throw new ApiError(
+        "sample_only",
+        "Connect the backend to save assembly progress.",
+        422,
+        false,
+      );
+    },
+    async saveGuideProgress() {
+      throw new ApiError(
+        "sample_only",
+        "Connect the backend to save assembly progress.",
+        422,
+        false,
+      );
+    },
     async getBuildGuide() {
-      throw new ApiError("sample_only", "Assembly guides require a real accepted CAD revision.", 409, false);
+      throw new ApiError(
+        "sample_only",
+        "Assembly guides require a real accepted CAD revision.",
+        409,
+        false,
+      );
     },
     resolveArtifactUrl: (u) => u,
   };
@@ -442,8 +775,15 @@ function applyPartPatch(p: Project, pt: PartPatch) {
   if (!part) {
     const maxX = p.parts.reduce((m, x) => Math.max(m, x.pose[0] + (x.size.x.value ?? 20)), -4);
     part = {
-      id: uid("part"), label: pt.label ?? "New part", category: pt.category ?? "other", identityProposed: null,
-      identityAccepted: null, status: "proposed", size: unknown3(), pose: [maxX + 4, 0, 4], visible: true,
+      id: uid("part"),
+      label: pt.label ?? "New part",
+      category: pt.category ?? "other",
+      identityProposed: null,
+      identityAccepted: null,
+      status: "proposed",
+      size: unknown3(),
+      pose: [maxX + 4, 0, 4],
+      visible: true,
     };
     p.parts.push(part);
   }
@@ -457,14 +797,25 @@ function applyPartPatch(p: Project, pt: PartPatch) {
   }
   if (pt.visible !== undefined) part.visible = pt.visible;
   if (pt.size) {
-    for (const [k, v] of Object.entries(pt.size) as ["x" | "y" | "z", { value: number | null; accept: boolean }][]) {
-      part.size[k] = v.value == null ? unknown() : { value: v.value, status: v.accept ? "accepted" : "proposed", sourceId: part.size[k].sourceId };
+    for (const [k, v] of Object.entries(pt.size) as [
+      "x" | "y" | "z",
+      { value: number | null; accept: boolean },
+    ][]) {
+      part.size[k] =
+        v.value == null
+          ? unknown()
+          : {
+              value: v.value,
+              status: v.accept ? "accepted" : "proposed",
+              sourceId: part.size[k].sourceId,
+            };
     }
   }
 }
 
 async function downscale(file: File): Promise<string> {
-  if (!/^image\/(png|jpe?g|webp)$/.test(file.type)) throw new ApiError("invalid_mime", "Use a JPG, PNG or WEBP photo.", 400, false);
+  if (!/^image\/(png|jpe?g|webp)$/.test(file.type))
+    throw new ApiError("invalid_mime", "Use a JPG, PNG or WEBP photo.", 400, false);
   const dataUrl = await new Promise<string>((res, rej) => {
     const r = new FileReader();
     r.onload = () => res(String(r.result));

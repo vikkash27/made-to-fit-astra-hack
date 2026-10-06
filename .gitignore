@@ -43,3 +43,6 @@ __pycache__/
 .ruff_cache/
 graphify-out/
 .impeccable/review/
+
+# Root runtime data from local Python imports
+.data/

@@ -36,7 +36,7 @@ export default function ReferenceViewer({
     <div className="relative h-[300px] overflow-hidden rounded-sm border border-border">
       {scene && (
         <Canvas camera={{ position: [3, 2, 3], fov: 40 }} dpr={[1, 1.5]}>
-          <color attach="background" args={["#15191c"]} />
+          <color attach="background" args={["#ffffff"]} />
           <ambientLight intensity={1.5} />
           <directionalLight position={[3, 5, 2]} intensity={3} />
           <Suspense fallback={null}>
@@ -67,7 +67,7 @@ export default function ReferenceViewer({
       )}
       {q.isPending && (
         <p role="status" className="p-4 text-sm">
-          Loading Rodin reference…
+          Loading 3D model…
         </p>
       )}
       {q.error && (
@@ -78,7 +78,7 @@ export default function ReferenceViewer({
       <p className="pointer-events-none absolute bottom-3 left-3 bg-background/85 px-2 py-1 text-[11px] text-foreground">
         {alignment
           ? "Illustrative appearance · orange measured envelope"
-          : "Rodin appearance reference · source coordinates · dimensions unverified"}
+          : "3D appearance model · measurements unverified"}
       </p>
     </div>
   );

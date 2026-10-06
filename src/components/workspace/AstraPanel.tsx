@@ -1,7 +1,8 @@
+import { AstraMarkdown } from "./AstraMarkdown";
 import { JobProgress } from "./JobProgress";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { Message, MessageCard, Project } from "@/lib/domain/types";
+import type { Message, MessageCard, Project, Stage } from "@/lib/domain/types";
 import { errorMessage, projectKey, useProjectAction } from "@/lib/api/hooks";
 import { parseDimensionInput } from "@/lib/domain/dimensions";
 import { applyCheckedChange } from "@/lib/flows-revision";
@@ -9,15 +10,39 @@ import { useViewer } from "@/lib/store/viewer-store";
 import { Composer } from "@/components/studio/Composer";
 import { Btn, ErrorNote, SampleTag } from "./ui";
 
+const PROMPTS: Record<Stage, string[]> = {
+  parts: ["Help me identify the selected part", "What should I check in this photo?"],
+  discover: ["Which project is easiest for a beginner?", "What extra hardware would I need?"],
+  confirm: ["How do I measure this part?", "Which dimensions include connectors?"],
+  engineer: ["Explain the geometry checks", "What should I review before accepting?"],
+  export: ["How do I prepare these files for printing?", "Explain the assembly steps"],
+};
+const PLACEHOLDERS: Record<Stage, string> = {
+  parts: "Ask about a part or its identity…",
+  discover: "Ask about your project options…",
+  confirm: "Ask how to measure your hardware…",
+  engineer: "Ask about fit, checks or a design change…",
+  export: "Ask about printing or assembly…",
+};
+
 export function AstraPanel({
   project,
   displayRevisionId,
+  stage = "engineer",
+  draft,
+  onDraftChange,
 }: {
   project: Project;
   displayRevisionId: string | null;
+  stage?: Stage;
+  draft?: string;
+  onDraftChange?: (text: string) => void;
 }) {
   const selectedId = useViewer((s) => s.selectedId);
-  const end = useRef<HTMLDivElement>(null);
+  const conversation = useRef<HTMLDivElement>(null);
+  const following = useRef(true);
+  const [newResponse, setNewResponse] = useState(false);
+  const [pendingText, setPendingText] = useState<string | null>(null);
   const concept = project.concepts.find((c) => c.id === project.selectedConceptId);
   const rev = project.revisions.find((r) => r.id === displayRevisionId);
   const selPart = project.parts.find((p) => p.id === selectedId);
@@ -29,38 +54,73 @@ export function AstraPanel({
   ].filter(Boolean) as string[];
 
   const send = useProjectAction(project.id, (ad, text: string) =>
-    ad.agent(project.id, { text, parentRevisionId: project.acceptedRevisionId, context }),
+    ad.agent(project.id, {
+      text,
+      parentRevisionId: project.acceptedRevisionId,
+      currentStage: stage,
+      context,
+    }),
   );
   const agentJob = project.jobs.find(
     (j) => j.kind === "agent" && (j.stage === "queued" || j.stage === "running"),
   );
 
   useEffect(() => {
-    end.current?.scrollIntoView({ block: "end" });
-  }, [project.messages.length, agentJob?.stage]);
+    if (following.current && conversation.current)
+      conversation.current.scrollTop = conversation.current.scrollHeight;
+    else setNewResponse(true);
+  }, [project.messages.length, agentJob?.backendStage]);
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-4" aria-live="polite">
+      <div
+        ref={conversation}
+        onScroll={() => {
+          const el = conversation.current;
+          if (el) following.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+          if (following.current) setNewResponse(false);
+        }}
+        className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4"
+        role="log"
+        aria-label="Conversation with Astra"
+        aria-live="polite"
+      >
         {project.messages.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Ask Astra to change the design. Select a part first to give it context.
+            Ask about your parts, your project or the next step. Select a part to discuss it.
           </p>
         )}
         {project.messages.map((m) => (
           <MessageView key={m.id} m={m} project={project} />
         ))}
-        {agentJob && <JobProgress job={agentJob} />}
-        <div ref={end} />
+        {pendingText && send.isPending && (
+          <div className="ml-8 rounded-md bg-foreground px-3 py-2 text-sm text-background">
+            <p>{pendingText}</p>
+            <p className="mt-1 text-xs">Sending…</p>
+          </div>
+        )}
+        {agentJob && (
+          <div className="rounded-md bg-accent p-3">
+            <JobProgress job={agentJob} compact />
+            <p className="mt-2 text-xs text-muted-foreground">
+              Astra is working with your current project. New results appear here when ready.
+            </p>
+          </div>
+        )}
       </div>
-      {project.jobs
-        .filter((j) => j.kind === "agent" && j.stage === "failed")
-        .slice(-1)
-        .map((j) => (
-          <p key={j.id} role="alert" className="px-4 py-2 text-sm text-destructive">
-            {j.error ?? "Astra job failed. Accepted geometry is preserved."}
-          </p>
-        ))}
+      {newResponse && (
+        <button
+          className="mx-4 mb-2 rounded-full bg-accent py-2 text-xs text-primary"
+          onClick={() => {
+            if (conversation.current)
+              conversation.current.scrollTop = conversation.current.scrollHeight;
+            following.current = true;
+            setNewResponse(false);
+          }}
+        >
+          View latest update
+        </button>
+      )}
       <div className="border-t border-border p-3">
         <div className="mb-2 flex flex-wrap gap-1.5">
           {selPart && <Chip>Selected · {selPart.label}</Chip>}
@@ -68,14 +128,36 @@ export function AstraPanel({
           {concept && <Chip>Concept · {concept.formFactor}</Chip>}
           {rev && <Chip>{rev.label}</Chip>}
           {rev?.locks.map((l) => (
-            <Chip key={l}>Locked · {l}</Chip>
+            <Chip key={l}>Locked · {l.replace(/[:_]/g, " ")}</Chip>
+          ))}
+        </div>
+        <div className="mb-3 flex flex-wrap gap-2">
+          {PROMPTS[stage].map((prompt) => (
+            <button
+              key={prompt}
+              disabled={send.isPending || !!agentJob}
+              onClick={() => onDraftChange?.(prompt)}
+              className="rounded-full border border-border px-3 py-2 text-left text-xs text-muted-foreground hover:border-primary hover:text-primary"
+            >
+              {prompt}
+            </button>
           ))}
         </div>
         <Composer
+          value={draft}
+          onTextChange={onDraftChange}
           allowFiles={false}
           busy={send.isPending || !!agentJob}
-          placeholder="Make it taller, thicker walls, battery accessible…"
-          onSubmit={(v) => send.mutate([v.text])}
+          placeholder={PLACEHOLDERS[stage]}
+          onSubmit={async (v) => {
+            following.current = true;
+            setPendingText(v.text);
+            try {
+              await send.mutateAsync([v.text]);
+            } finally {
+              setPendingText(null);
+            }
+          }}
         />
         <ErrorNote error={send.error} />
       </div>
@@ -85,7 +167,7 @@ export function AstraPanel({
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-sm border border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">
+    <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">
       {children}
     </span>
   );
@@ -103,11 +185,11 @@ function MessageView({ m, project }: { m: Message; project: Project }) {
   return (
     <div className="text-sm">
       <div className="mb-1 flex items-center gap-2">
-        <span className="size-2 bg-primary" aria-hidden />
+        <span className="size-2 rounded-full bg-primary" aria-hidden />
         <span className="font-mono text-xs">Astra</span>
         {m.sample && <SampleTag />}
       </div>
-      <p className="whitespace-pre-wrap leading-relaxed text-foreground/90">{m.text}</p>
+      <AstraMarkdown text={m.text} />
       {m.refs
         ?.filter((r) => r.startsWith("selection:"))
         .map((r) => {
@@ -171,7 +253,8 @@ function Card({ card, project }: { card: MessageCard; project: Project }) {
               onChange={(e) => setVal(e.target.value)}
               inputMode="decimal"
               placeholder="mm"
-              className="w-24 rounded-sm border border-border bg-background px-2 py-1 font-mono text-sm outline-none focus:border-primary"
+              aria-label={`${part?.label ?? "Part"} ${card.field.toUpperCase()} measurement in mm`}
+              className="w-24 rounded-full border border-border bg-background px-2 py-1 font-mono text-sm outline-none focus:border-primary"
             />
             <Btn variant="primary" className="h-8 px-3 text-xs" type="submit">
               Save measurement

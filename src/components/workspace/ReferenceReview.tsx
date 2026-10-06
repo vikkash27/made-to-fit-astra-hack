@@ -45,8 +45,8 @@ export function ReferenceReview({
         {asset.calibration.status === "reviewed" ? "Appearance aligned" : "Alignment needed"}
       </p>
       <p className="my-2 text-xs text-muted-foreground">
-        Rendered mode uses this model after you review its alignment. CAD and checks use the
-        measured envelope; Rodin supplies appearance only.
+        Rendered mode shows this model automatically. Review its orientation to refine the
+        appearance fit. CAD and checks use the measured envelope.
       </p>
       {file && (
         <a

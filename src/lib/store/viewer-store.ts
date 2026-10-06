@@ -27,7 +27,7 @@ export const useViewer = create<ViewerState>((set) => ({
   selectedId: null,
   hidden: {},
   isolatedId: null,
-  mode: "cad",
+  mode: "rendered",
   explode: 0,
   xray: false,
   showDims: true,

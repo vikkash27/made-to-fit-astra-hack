@@ -46,6 +46,7 @@ class Jobs:
     def __init__(self, store, settings):
         self.store, self.settings = store, settings
         self.executor = ThreadPoolExecutor(max_workers=3, thread_name_prefix="made-to-fit")
+        self.visual_executor = ThreadPoolExecutor(max_workers=3, thread_name_prefix="appearance")
         self.cad_lock = threading.Lock()
         self.handlers = {}
         self.running = set()
@@ -118,7 +119,12 @@ class Jobs:
             if key in self.running or self.store.get("job", key)["stage"] in TERMINAL:
                 return
             self.running.add(key)
-            self.executor.submit(self._run, key)
+            executor = (
+                self.visual_executor
+                if self.store.get("job", key)["kind"] == "visual_asset"
+                else self.executor
+            )
+            executor.submit(self._run, key)
 
     def _run(self, key):
         started = time.monotonic()
@@ -195,3 +201,4 @@ class Jobs:
     def close(self):
         self.stop.set()
         self.executor.shutdown(wait=True, cancel_futures=True)
+        self.visual_executor.shutdown(wait=True, cancel_futures=True)

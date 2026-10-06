@@ -83,7 +83,14 @@ class JobView(Public):
     id: str
     job_id: str
     kind: Literal[
-        "cad_build", "photo_analysis", "lookup", "concept_generation", "agent", "visual_asset"
+        "cad_build",
+        "photo_analysis",
+        "lookup",
+        "concept_generation",
+        "agent",
+        "visual_asset",
+        "wiring_plan",
+        "dimension_estimation",
     ]
     project_id: str
     revision_id: str | None

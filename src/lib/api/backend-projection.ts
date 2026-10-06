@@ -3,28 +3,36 @@ import type {
   ArtifactRecord,
   CheckRecord,
   ComponentRecord,
+  ComponentProposalRecord,
   ConceptRecord,
   JobRecord,
   RevisionRecord,
 } from "./backend-types";
 
 export const time = (value?: string) => (value ? Date.parse(value) : 0);
-export function projectPart(c: ComponentRecord): Part {
-  const category = /battery|lipo/i.test(c.name)
-    ? "battery"
-    : /display|screen|oled/i.test(c.name)
-      ? "display"
-      : /sensor/i.test(c.name)
-        ? "sensor"
-        : /board|controller|esp|arduino/i.test(c.name)
-          ? "controller"
-          : "other";
+export function projectPart(c: ComponentRecord, proposal?: ComponentProposalRecord): Part {
+  const classify = (text: string): Part["category"] | undefined => {
+    if (/connector|receptacle|plug/i.test(text)) return "other";
+    if (/battery|lipo|lithium.polymer/i.test(text)) return "battery";
+    if (/display|screen|oled/i.test(text)) return "display";
+    if (/sensor/i.test(text)) return "sensor";
+    if (/board|controller|esp|arduino/i.test(text)) return "controller";
+    return undefined;
+  };
+  const category = classify(c.name) ?? classify(c.identity ?? "") ?? "other";
   return {
     id: c.part_id,
     label: c.name,
     category,
     identityProposed: c.identity,
     identityAccepted: c.identity_confirmed ? (c.identity ?? c.name) : null,
+    photoObservations: proposal
+      ? {
+          markings: proposal.visible_markings ?? [],
+          connections: proposal.observed_connections ?? [],
+          question: proposal.question,
+        }
+      : undefined,
     status: c.identity_confirmed ? "accepted" : "proposed",
     size: Object.fromEntries(
       ["x", "y", "z"].map((k, i) => [
@@ -119,7 +127,7 @@ export function projectRevision(r: RevisionRecord, index = 0): Revision {
     eligible: r.eligible_for_acceptance ?? false,
     specHash: r.spec_hash,
     assembly: r.manifest,
-    parts: r.spec.components.map(projectPart),
+    parts: r.spec.components.map((c) => projectPart(c)),
     enclosureSize: e ? [e.width_mm, e.depth_mm, e.height_mm] : undefined,
   };
 }
@@ -130,6 +138,8 @@ export const jobKind: Record<JobRecord["kind"], Job["kind"]> = {
   concept_generation: "concepts",
   agent: "agent",
   visual_asset: "reference",
+  wiring_plan: "wiring",
+  dimension_estimation: "dimensions",
 };
 export function jobStage(s: string): Job["stage"] {
   return s === "ready"

@@ -350,6 +350,7 @@ class AgentRequest(Operation):
     expected_draft_version: int
     parent_revision_id: str | None
     selected_part_id: PartID | None = None
+    current_stage: Literal["parts", "discover", "confirm", "engineer", "export"] | None = None
 
 
 class AssetRequest(Operation):

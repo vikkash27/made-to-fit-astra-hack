@@ -14,6 +14,7 @@ import type {
   Project,
   Revision,
   SourceDoc,
+  Stage,
 } from "@/lib/domain/types";
 
 export interface Health {
@@ -61,6 +62,7 @@ export interface CreateProjectInput {
 }
 
 export interface PartPatch {
+  dimensionsSource?: "user_measurement" | "user_confirmed_photo_estimate";
   id?: string;
   label?: string;
   category?: Part["category"];
@@ -106,6 +108,7 @@ export interface BackendAdapter {
   updatePreferences(id: string, prefs: Preferences): Promise<Project>;
   uploadPhoto(projectId: string, file: File): Promise<{ id: string; url: string }>;
   analyzePhotos(projectId: string, photoIds: string[]): Promise<JobRef>;
+  estimateDimensions(projectId: string, partIds: string[], operationId: string): Promise<JobRef>;
   lookupEvidence(projectId: string, partId: string, hint?: string): Promise<JobRef>;
   getEvidence(projectId: string, partId: string): Promise<Evidence>;
   confirmComponents(projectId: string, draftVersion: number, parts: PartPatch[]): Promise<Project>;
@@ -114,7 +117,12 @@ export interface BackendAdapter {
   selectConcept(projectId: string, conceptId: string, draftVersion: number): Promise<Project>;
   agent(
     projectId: string,
-    input: { text: string; parentRevisionId: string | null; context: string[] },
+    input: {
+      text: string;
+      parentRevisionId: string | null;
+      context: string[];
+      currentStage?: Stage;
+    },
   ): Promise<JobRef>;
   createCandidate(
     projectId: string,
@@ -137,6 +145,24 @@ export interface BackendAdapter {
   ): Promise<JobRef>;
   getJob(jobId: string): Promise<JobStatus>;
   getExports(revisionId: string): Promise<Artifact[]>;
+  getWiringPlan(revisionId: string): Promise<import("./backend-types").WiringState>;
+  generateWiringPlan(revisionId: string, sourceUrls: string[]): Promise<JobRef>;
+  reviewWiringPlan(
+    revisionId: string,
+    input: {
+      plan_id: string;
+      plan_hash: string;
+      reviewed_connection_ids: string[];
+      confirm_exact_modules_and_pinouts: boolean;
+      confirm_power_and_logic_levels: boolean;
+    },
+  ): Promise<import("./backend-types").WiringState>;
+  getGuideProgress(revisionId: string): Promise<import("./backend-types").GuideProgressRecord>;
+  saveGuideProgress(
+    revisionId: string,
+    completedStepIds: string[],
+    wiringPlanId: string | null,
+  ): Promise<import("./backend-types").GuideProgressRecord>;
   getBuildGuide(revisionId: string): Promise<import("./backend-types").BuildGuideRecord>;
   /** Fixture-only helper; HTTP mode resolves the stored URL. */
   resolveArtifactUrl(url: string): string;

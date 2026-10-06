@@ -344,7 +344,65 @@ def create_app(settings=None):
         agent=ai.agent,
         visual_asset=rodin.run,
     )
+    from app.services.wiring import Wiring, WiringRequest, WiringReview, GuideProgress
+
+    wiring = Wiring(store, ai, artifacts, jobs)
+    jobs.handlers["wiring_plan"] = wiring.generate
+    api.state.wiring = wiring
+
+    @api.get("/revisions/{revision_id}/wiring-plan")
+    def wiring_get(revision_id: str):
+        return wiring.get(revision_id)
+
+    @api.post("/revisions/{revision_id}/wiring-plan", status_code=202, response_model=JobView)
+    def wiring_generate(revision_id: str, request: WiringRequest):
+        ai.require_configured()
+        r = wiring.revision(revision_id)
+        return jobs.create(
+            "wiring_plan",
+            r["project_id"],
+            request.model_dump(mode="json"),
+            request.client_operation_id,
+            revision_id=revision_id,
+        )
+
+    @api.post("/revisions/{revision_id}/wiring-plan/review")
+    def wiring_review(revision_id: str, request: WiringReview):
+        return wiring.review(revision_id, request)
+
+    @api.get("/revisions/{revision_id}/guide-progress")
+    def guide_progress_get(revision_id: str):
+        return wiring.progress(revision_id)
+
+    @api.patch("/revisions/{revision_id}/guide-progress")
+    def guide_progress_save(revision_id: str, request: GuideProgress):
+        return wiring.progress(revision_id, request)
+
     api.state.ai, api.state.rodin = ai, rodin
+    from app.services.dimensions import Dimensions, DimensionEstimateRequest
+
+    dimensions = Dimensions(store, ai, photos, jobs)
+    api.state.dimensions = dimensions
+    jobs.handlers["dimension_estimation"] = dimensions.generate
+
+    @api.get("/projects/{project_id}/dimension-estimates")
+    def dimension_estimates_get(project_id: str):
+        return dict(estimates=dimensions.get(project_id))
+
+    @api.post("/projects/{project_id}/dimension-estimates", status_code=202, response_model=JobView)
+    def dimension_estimates_generate(project_id: str, request: DimensionEstimateRequest):
+        ai.require_configured()
+        p = store.get("project", project_id)
+        if not set(request.part_ids).issubset(c["part_id"] for c in p["components"]):
+            raise DomainError(
+                "invalid_reference", "Estimate parts must belong to this project", 422
+            )
+        return jobs.create(
+            "dimension_estimation",
+            project_id,
+            request.model_dump(mode="json"),
+            request.client_operation_id,
+        )
 
     @api.post("/projects/{project_id}/photos/analyze", status_code=202, response_model=JobView)
     def analyze(project_id: str, request: PhotoAnalyzeRequest):

@@ -22,9 +22,13 @@ export function PartReference({ project, part }: { project: Project; part: Part 
   if (getAdapter().mode !== "http" || !part.photoId) return null;
   return (
     <div className="mt-4 border-t border-border pt-4">
-      <p className="text-sm">Component appearance · Rodin</p>
+      <p className="text-sm">3D appearance</p>
       <p className="my-2 text-xs text-muted-foreground">
-        Uses this part’s photo crop. This paid mesh does not supply dimensions or certify fit.
+        Uses this part’s photo crop. This model shows appearance; confirm physical measurements to
+        check fit.
+      </p>
+      <p className="mb-3 text-xs text-muted-foreground">
+        Confirmed photo parts start creating a model automatically. Existing models are kept.
       </p>
       <div className="mb-3 flex flex-wrap gap-2">
         <select
@@ -33,20 +37,20 @@ export function PartReference({ project, part }: { project: Project; part: Part 
           onChange={(e) => setDetail(e.target.value as typeof detail)}
           className="rounded-sm border border-border bg-background px-2 py-1.5 text-sm"
         >
-          <option value="standard">Standard · 10,000 faces</option>
-          <option value="detailed">Detailed · 20,000 faces</option>
+          <option value="standard">Standard detail</option>
+          <option value="detailed">High detail</option>
         </select>
         <Btn
           variant="outline"
           disabled={generate.isPending || !!blocked || part.status !== "accepted"}
           onClick={() => generate.mutate([])}
         >
-          {asset ? "Generate a new reference" : "Generate component reference"}
+          {asset ? "Create a new 3D model" : "Create 3D model"}
         </Btn>
       </div>
       {part.status !== "accepted" && (
         <p className="my-2 text-xs text-muted-foreground">
-          Confirm this part and crop before generating.
+          Confirm the part and its crop to create its 3D model.
         </p>
       )}
       <ErrorNote error={generate.error} />
