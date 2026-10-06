@@ -1,1 +1,1 @@
-- [ ] Brighter (light) theme for the studio workspace
+- [x] Brighter (light) theme for the studio workspace
