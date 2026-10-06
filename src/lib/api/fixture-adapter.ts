@@ -102,17 +102,17 @@ const SAMPLE_EVIDENCE: Record<string, Omit<Evidence, "partId">> = {
   "part-controller": {
     candidates: [{ identity: "RP2040 dev board (Pico-class)", confidence: 0.7 }],
     proposals: [{ field: "x", value: 21, sourceId: "src-pico" }, { field: "y", value: 51, sourceId: "src-pico" }, { field: "z", value: 3.9, sourceId: "src-pico" }],
-    sources: [SAMPLE_SOURCES[0]], missing: [], sample: true,
+    sources: [SAMPLE_SOURCES[0]!], missing: [], sample: true,
   },
   "part-display": {
     candidates: [{ identity: "0.96in OLED 128×64, I²C", confidence: 0.6 }],
     proposals: [{ field: "x", value: 27.3, sourceId: "src-oled" }, { field: "y", value: 27.8, sourceId: "src-oled" }],
-    sources: [SAMPLE_SOURCES[1]], missing: ["z"], sample: true,
+    sources: [SAMPLE_SOURCES[1]!], missing: ["z"], sample: true,
   },
   "part-sensor": {
     candidates: [{ identity: "BME280 breakout", confidence: 0.65 }],
     proposals: [{ field: "x", value: 15, sourceId: "src-bme" }, { field: "y", value: 12, sourceId: "src-bme" }],
-    sources: [SAMPLE_SOURCES[2]], missing: ["z"], sample: true,
+    sources: [SAMPLE_SOURCES[2]!], missing: ["z"], sample: true,
   },
   "part-battery": {
     candidates: [{ identity: "LiPo pouch, 503450-class", confidence: 0.4 }],

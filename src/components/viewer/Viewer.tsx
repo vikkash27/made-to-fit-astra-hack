@@ -65,7 +65,7 @@ function Scene({ parts, params }: { parts: Part[]; params: EnclosureParams | nul
       front: [0, ty, d * 1.5],
       side: [d * 1.5, ty, 0],
     };
-    const p = pos[v.cameraPreset];
+    const p = pos[v.cameraPreset]!;
     void c.setLookAt(p[0], p[1], p[2], 0, ty, 0, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v.cameraNonce, extent]);
