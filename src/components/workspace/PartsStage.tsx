@@ -1,6 +1,6 @@
 import { JobProgress } from "./JobProgress";
 import { latestJob } from "@/lib/domain/job-timing";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, ArrowRight, Box, Check, Expand, Plus, Trash2, Upload } from "lucide-react";
 import type { Part, Project, Stage } from "@/lib/domain/types";
 import { getAdapter } from "@/lib/api";
@@ -14,8 +14,14 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Brief, ExperienceChips } from "./Brief";
 import { Btn, ErrorNote, SampleTag } from "./ui";
 import { ReferenceReview } from "./ReferenceReview";
+import { parseDimensionInput } from "@/lib/domain/dimensions";
 
 const CATS: Part["category"][] = ["controller", "display", "sensor", "battery", "other"];
+const MEASUREMENT_AXES = [
+  { axis: "x", label: "Width" },
+  { axis: "y", label: "Depth" },
+  { axis: "z", label: "Height" },
+] as const;
 
 export function PartsStage({
   project,
@@ -30,6 +36,13 @@ export function PartsStage({
   const [photoOpen, setPhotoOpen] = useState(false);
   const [photoId, setPhotoId] = useState<string | null>(null);
   const selected = useViewer((s) => s.selectedId);
+  const reviewForm = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const form = reviewForm.current;
+    if (!form || !form.getClientRects().length) return;
+    form.scrollIntoView({ block: "nearest", behavior: "auto" });
+    form.focus({ preventScroll: true });
+  }, [selected]);
   const select = useViewer((s) => s.select);
   const selectedPhotoId = project.parts.find((p) => p.id === selected)?.photoId;
   const photo =
@@ -75,7 +88,7 @@ export function PartsStage({
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
             {project.parts.length
-              ? "Select a part to check its name and photo crop. Measurements come next."
+              ? "Select a part to check its name, photo crop and measurements. You can also measure later."
               : "Upload a clear photo or add a part by hand. Astra can suggest what it is."}
           </p>
         </div>
@@ -223,7 +236,13 @@ export function PartsStage({
             </div>
           )}
           {(sel || adding) && (
-            <section id="part-review" className="mt-6" aria-label="Review selected part">
+            <section
+              ref={reviewForm}
+              tabIndex={-1}
+              id="part-review"
+              className="mt-6 scroll-mt-4 rounded-md focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label="Review selected part"
+            >
               <PartEditor
                 key={adding ? "new" : sel?.id}
                 project={project}
@@ -400,7 +419,7 @@ export function PartThumbnail({ project, part }: { project: Project; part: Part 
   );
 }
 
-function PartEditor({
+export function PartEditor({
   project,
   part,
   onDone,
@@ -411,6 +430,22 @@ function PartEditor({
 }) {
   const [label, setLabel] = useState(part?.label ?? "");
   const [identity, setIdentity] = useState(part?.identityAccepted ?? part?.identityProposed ?? "");
+  const [measurements, setMeasurements] = useState(() =>
+    Object.fromEntries(
+      MEASUREMENT_AXES.map(({ axis }) => [axis, String(part?.size[axis].value ?? "")]),
+    ),
+  );
+  const measurementsChanged = MEASUREMENT_AXES.some(
+    ({ axis }) => measurements[axis] !== String(part?.size[axis].value ?? ""),
+  );
+  const hasMeasurements = MEASUREMENT_AXES.some(({ axis }) => !!measurements[axis]?.trim());
+  const completeMeasurements = MEASUREMENT_AXES.every(
+    ({ axis }) => parseDimensionInput(measurements[axis] ?? "") != null,
+  );
+  const invalidMeasurements = MEASUREMENT_AXES.some(
+    ({ axis }) =>
+      !!measurements[axis]?.trim() && parseDimensionInput(measurements[axis] ?? "") == null,
+  );
   const [crop, setCrop] = useState(() =>
     part?.anchor
       ? [
@@ -430,6 +465,20 @@ function PartEditor({
         category: cat,
         identityAccepted: accept ? identity || label : (part?.identityAccepted ?? null),
         accept,
+        ...(measurementsChanged || (accept && hasMeasurements)
+          ? {
+              dimensionsSource: "user_measurement" as const,
+              size: Object.fromEntries(
+                MEASUREMENT_AXES.map(({ axis }) => [
+                  axis,
+                  {
+                    value: parseDimensionInput(measurements[axis] ?? ""),
+                    accept: accept && completeMeasurements,
+                  },
+                ]),
+              ),
+            }
+          : {}),
         ...(crop.length === 4 && part?.photoId
           ? {
               crop: {
@@ -518,18 +567,54 @@ function PartEditor({
           ))}
         </select>
       </label>
+      <fieldset className="space-y-3 sm:col-span-2">
+        <legend className="text-sm font-medium">Measurements · millimetres</legend>
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          Enter your own measurements here, including connectors and tall components. You can leave
+          them blank and measure later; blanks stay unknown.
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          {MEASUREMENT_AXES.map(({ axis, label: axisLabel }) => (
+            <label key={axis} className="min-w-0 text-xs text-muted-foreground">
+              {axisLabel}
+              <div className="mt-1 flex items-center rounded-sm border border-border bg-background focus-within:border-primary">
+                <input
+                  inputMode="decimal"
+                  aria-label={`${label || "Part"} ${axisLabel} in mm`}
+                  value={measurements[axis] ?? ""}
+                  placeholder="unknown"
+                  onChange={(event) =>
+                    setMeasurements((current) => ({ ...current, [axis]: event.target.value }))
+                  }
+                  className="min-w-0 w-full bg-transparent px-2 py-2 font-mono text-sm text-foreground outline-none"
+                />
+                <span className="pr-2">mm</span>
+              </div>
+            </label>
+          ))}
+        </div>
+        {invalidMeasurements && (
+          <p role="alert" className="text-xs text-destructive">
+            Enter a positive number in millimetres, or leave the field blank.
+          </p>
+        )}
+      </fieldset>
       <div className="flex flex-wrap items-end gap-2">
         <Btn
           variant="primary"
-          disabled={save.isPending || !label}
+          disabled={save.isPending || !label || invalidMeasurements}
           onClick={() => save.mutate([true], { onSuccess: onDone })}
         >
-          {part ? "Confirm identity" : "Add part"}
+          {completeMeasurements
+            ? "Confirm identity & measurements"
+            : part
+              ? "Confirm identity"
+              : "Add part"}
         </Btn>
         {part && (
           <Btn
             onClick={() => save.mutate([false], { onSuccess: onDone })}
-            disabled={save.isPending}
+            disabled={save.isPending || invalidMeasurements}
           >
             Save
           </Btn>

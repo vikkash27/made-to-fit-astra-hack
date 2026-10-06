@@ -364,3 +364,59 @@ def test_requested_unknown_analysis_blocks_acceptance(api):
     r = built(client, candidate(client, p, spec))
     assert not r["eligible_for_acceptance"]
     assert next(c for c in r["checks"] if c["check_id"] == "thermal")["required"]
+
+
+def test_removed_inventory_and_unconfirmed_proposals_do_not_reappear(api):
+    from app.schemas import Component
+    from app.store import now
+
+    client, app = api
+    p = project(client)
+    parts = [
+        Component(part_id="photo-part", name="Photographed controller"),
+        Component(part_id="text-duplicate", name="Controller"),
+    ]
+    with app.state.store.transaction():
+        for component in parts:
+            app.state.store.put(
+                "component_proposal",
+                dict(
+                    id=f"proposal-{component.part_id}",
+                    project_id=p["id"],
+                    draft_version=1,
+                    component=component.model_dump(mode="json"),
+                    question="Review",
+                    created_at=now(),
+                ),
+            )
+    p = post(
+        client,
+        f"/projects/{p['id']}/components/confirm",
+        dict(
+            expected_draft_version=1,
+            components=[parts[1].model_dump(mode="json")],
+        ),
+    )
+    p = post(
+        client,
+        f"/projects/{p['id']}/components/confirm",
+        dict(
+            expected_draft_version=p["draft_version"],
+            components=[],
+            remove_part_ids=["text-duplicate"],
+        ),
+    )
+    assert p["components"] == []
+    proposals = client.get(f"/projects/{p['id']}/component-proposals").json()["proposals"]
+    assert [v["component"]["part_id"] for v in proposals] == ["photo-part"]
+    p = post(
+        client,
+        f"/projects/{p['id']}/components/confirm",
+        dict(
+            expected_draft_version=p["draft_version"],
+            components=[],
+            remove_part_ids=["photo-part"],
+        ),
+    )
+    assert client.get(f"/projects/{p['id']}/component-proposals").json()["proposals"] == []
+    assert len(app.state.store.all("component_proposal", project_id=p["id"])) == 2

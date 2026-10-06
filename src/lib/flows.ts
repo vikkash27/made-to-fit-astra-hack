@@ -34,7 +34,9 @@ export async function startProject(input: {
     for (const f of input.files) ids.push((await ad.uploadPhoto(project.id, f)).id);
     await ad.analyzePhotos(project.id, ids);
   }
-  if (initialText && ad.mode === "http") {
+  // The brief is already persisted. Photo intake owns the inventory when photos
+  // are supplied; starting text intake too would propose the same hardware twice.
+  if (initialText && ad.mode === "http" && !input.files.length) {
     // The initial brief is persisted even if provider admission fails; surface the failure.
     try {
       await ad.agent(project.id, { text: initialText, parentRevisionId: null, context: [] });

@@ -144,13 +144,24 @@ class Projects:
             if len(ids) != len(set(ids)) or set(ids) & set(request.remove_part_ids):
                 raise DomainError("invalid_input", "Duplicate or conflicting component IDs", 422)
             for part_id in request.remove_part_ids:
-                if part_id not in existing:
+                proposals = [
+                    proposal
+                    for proposal in self.store.all("component_proposal", project_id=key)
+                    if proposal["component"]["part_id"] == part_id
+                    and not proposal.get("dismissed_at")
+                ]
+                if part_id not in existing and not proposals:
                     raise DomainError("not_found", "Unknown component ID", 404)
-                if existing[part_id]["locked_fields"]:
+                if part_id in existing and existing[part_id]["locked_fields"]:
                     raise DomainError(
                         "locked_constraint", "Remove locks explicitly before removing component"
                     )
-                del existing[part_id]
+                existing.pop(part_id, None)
+                # Keep the original proposal as history, but never offer it again
+                # after an explicit removal, even when it was not yet confirmed.
+                for proposal in proposals:
+                    proposal["dismissed_at"] = now()
+                    self.store.put("component_proposal", proposal)
             for c in request.components:
                 value = c.model_dump(mode="json")
                 old = existing.get(c.part_id)

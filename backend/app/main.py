@@ -252,7 +252,11 @@ def create_app(settings=None):
     @api.get("/projects/{project_id}/component-proposals")
     def proposals(project_id: str):
         p = store.get("project", project_id)
-        values = store.all("component_proposal", project_id=project_id)
+        values = [
+            value
+            for value in store.all("component_proposal", project_id=project_id)
+            if not value.get("dismissed_at")
+        ]
         for value in values:
             value["stale"] = value["draft_version"] != p["draft_version"]
         return dict(proposals=values)
