@@ -1,8 +1,17 @@
+import { CadScene } from "./CadScene";
+import { SceneLabel as Html } from "./SceneLabel";
 import type React from "react";
 import { Canvas } from "@react-three/fiber";
-import { CameraControls, ContactShadows, Edges, Environment, Html, Lightformer, RoundedBox } from "@react-three/drei";
+import {
+  CameraControls,
+  ContactShadows,
+  Edges,
+  Environment,
+  Lightformer,
+  RoundedBox,
+} from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
-import type { EnclosureParams, Part, Vec3 } from "@/lib/domain/types";
+import type { EnclosureParams, Part, Vec3, Revision, Project } from "@/lib/domain/types";
 import { knownSize, previewEnclosureBounds } from "@/lib/domain/dimensions";
 import { CAD_GROUP_ROTATION_X, CAD_GROUP_SCALE } from "@/lib/domain/units";
 import { useViewer } from "@/lib/store/viewer-store";
@@ -23,24 +32,60 @@ interface Props {
   params: EnclosureParams | null;
   /** Shown in the canvas corner so the viewer never overstates what it is. */
   provenance: string;
+  revision?: Revision | null;
+  visualAssets?: Project["visualAssets"];
 }
 
-export default function Viewer({ parts, params, provenance }: Props) {
+export default function Viewer({ parts, params, provenance, revision, visualAssets }: Props) {
   return (
-    <div className="relative h-full w-full">
-      <Canvas shadows dpr={[1, 1.75]} camera={{ position: [0.22, 0.18, 0.22], fov: 32, near: 0.001, far: 10 }} gl={{ antialias: true }}>
+    <div data-viewer-root className="relative h-full w-full">
+      <Canvas
+        shadows
+        dpr={[1, 1.75]}
+        camera={{ position: [0.22, 0.18, 0.22], fov: 32, near: 0.001, far: 10 }}
+        gl={{ antialias: true }}
+      >
         <color attach="background" args={["#efece5"]} />
         <ambientLight intensity={0.35} />
-        <directionalLight position={[0.4, 0.8, 0.3]} intensity={1.6} castShadow shadow-mapSize={[1024, 1024]} />
+        <directionalLight
+          position={[0.4, 0.8, 0.3]}
+          intensity={1.6}
+          castShadow
+          shadow-mapSize={[1024, 1024]}
+        />
         <Environment resolution={128}>
-          <Lightformer intensity={1.6} position={[0, 2, 0]} scale={[4, 4, 1]} rotation-x={Math.PI / 2} />
-          <Lightformer intensity={0.6} color="#f2d6c4" position={[-2, 0.5, 1]} rotation-y={Math.PI / 2} scale={[4, 1, 1]} />
+          <Lightformer
+            intensity={1.6}
+            position={[0, 2, 0]}
+            scale={[4, 4, 1]}
+            rotation-x={Math.PI / 2}
+          />
+          <Lightformer
+            intensity={0.6}
+            color="#f2d6c4"
+            position={[-2, 0.5, 1]}
+            rotation-y={Math.PI / 2}
+            scale={[4, 1, 1]}
+          />
         </Environment>
-        <Scene parts={parts} params={params} />
-        <ContactShadows position={[0, -0.0005, 0]} opacity={0.55} scale={0.6} blur={2.4} far={0.2} />
+        {revision?.assembly ? (
+          <CadScene manifest={revision.assembly} visualAssets={visualAssets} />
+        ) : (
+          <Scene parts={parts} params={params} />
+        )}
+        <ContactShadows
+          position={[0, -0.0005, 0]}
+          opacity={0.55}
+          scale={0.6}
+          blur={2.4}
+          far={0.2}
+        />
         <gridHelper args={[0.6, 30, "#cfcac0", "#e0dcd3"]} position={[0, -0.001, 0]} />
       </Canvas>
-      <div className="label-mono pointer-events-none absolute bottom-3 right-4 text-[9.5px] text-muted-foreground">{provenance}</div>
+      <div data-viewer-labels className="pointer-events-none absolute inset-0 overflow-hidden" />
+      <div className="label-mono pointer-events-none absolute bottom-3 right-4 text-[9.5px] text-muted-foreground">
+        {provenance}
+      </div>
     </div>
   );
 }
@@ -48,7 +93,10 @@ export default function Viewer({ parts, params, provenance }: Props) {
 function Scene({ parts, params }: { parts: Part[]; params: EnclosureParams | null }) {
   const v = useViewer();
   const controls = useRef<React.ComponentRef<typeof CameraControls>>(null);
-  const bounds = useMemo(() => (params ? previewEnclosureBounds(parts, params) : null), [parts, params]);
+  const bounds = useMemo(
+    () => (params ? previewEnclosureBounds(parts, params) : null),
+    [parts, params],
+  );
   const center: Vec3 = bounds
     ? [(bounds.min[0] + bounds.max[0]) / 2, (bounds.min[1] + bounds.max[1]) / 2, 0]
     : [30, 30, 0];
@@ -70,7 +118,8 @@ function Scene({ parts, params }: { parts: Part[]; params: EnclosureParams | nul
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v.cameraNonce, extent]);
 
-  const visible = (p: Part) => p.visible && !v.hidden[p.id] && (!v.isolatedId || v.isolatedId === p.id);
+  const visible = (p: Part) =>
+    p.visible && !v.hidden[p.id] && (!v.isolatedId || v.isolatedId === p.id);
   const encVisible = !v.isolatedId && !v.hidden["enclosure"];
   const explodeMm = v.explode * 40;
 
@@ -78,7 +127,11 @@ function Scene({ parts, params }: { parts: Part[]; params: EnclosureParams | nul
     <>
       <CameraControls ref={controls} makeDefault minDistance={0.03} maxDistance={2} />
       {/* Single CAD → renderer boundary: mm Z-up children, metres Y-up scene. */}
-      <group rotation-x={CAD_GROUP_ROTATION_X} scale={CAD_GROUP_SCALE} onPointerMissed={() => v.select(null)}>
+      <group
+        rotation-x={CAD_GROUP_ROTATION_X}
+        scale={CAD_GROUP_SCALE}
+        onPointerMissed={() => v.select(null)}
+      >
         <group position={[-center[0], -center[1], 0]}>
           {bounds && params && encVisible && (
             <Enclosure bounds={bounds} params={params} explodeMm={explodeMm} />
@@ -87,7 +140,11 @@ function Scene({ parts, params }: { parts: Part[]; params: EnclosureParams | nul
             visible(p) ? <PartMesh key={p.id} part={p} lift={v.explode * (12 + i * 9)} /> : null,
           )}
           {bounds && v.showDims && encVisible && (
-            <Html position={[bounds.max[0] + 4, bounds.min[1], bounds.size[2] / 2]} center={false} zIndexRange={[10, 0]}>
+            <Html
+              position={[bounds.max[0] + 4, bounds.min[1], bounds.size[2] / 2]}
+              center={false}
+              zIndexRange={[10, 0]}
+            >
               <div className="label-mono whitespace-nowrap text-[9.5px] text-muted-foreground">
                 {bounds.size.map((n) => n.toFixed(1)).join(" × ")} mm
               </div>
@@ -99,7 +156,15 @@ function Scene({ parts, params }: { parts: Part[]; params: EnclosureParams | nul
   );
 }
 
-function Enclosure({ bounds, params, explodeMm }: { bounds: NonNullable<ReturnType<typeof previewEnclosureBounds>>; params: EnclosureParams; explodeMm: number }) {
+function Enclosure({
+  bounds,
+  params,
+  explodeMm,
+}: {
+  bounds: NonNullable<ReturnType<typeof previewEnclosureBounds>>;
+  params: EnclosureParams;
+  explodeMm: number;
+}) {
   const v = useViewer();
   const [w, d, h] = bounds.size;
   const [x0, y0] = bounds.min;
@@ -125,11 +190,26 @@ function Enclosure({ bounds, params, explodeMm }: { bounds: NonNullable<ReturnTy
     v.select("enclosure");
   };
   const walls: [Vec3, Vec3][] = [
-    [[cx, y0 + t / 2, baseH / 2], [w, t, baseH]],
-    [[cx, y0 + d - t / 2, baseH / 2], [w, t, baseH]],
-    [[x0 + t / 2, cy, baseH / 2], [t, d - 2 * t, baseH]],
-    [[x0 + w - t / 2, cy, baseH / 2], [t, d - 2 * t, baseH]],
-    [[cx, cy, t / 2], [w - 2 * t, d - 2 * t, t]],
+    [
+      [cx, y0 + t / 2, baseH / 2],
+      [w, t, baseH],
+    ],
+    [
+      [cx, y0 + d - t / 2, baseH / 2],
+      [w, t, baseH],
+    ],
+    [
+      [x0 + t / 2, cy, baseH / 2],
+      [t, d - 2 * t, baseH],
+    ],
+    [
+      [x0 + w - t / 2, cy, baseH / 2],
+      [t, d - 2 * t, baseH],
+    ],
+    [
+      [cx, cy, t / 2],
+      [w - 2 * t, d - 2 * t, t],
+    ],
   ];
   return (
     <group onClick={onClick}>
@@ -172,7 +252,9 @@ function PartMesh({ part, lift }: { part: Part; lift: number }) {
           <meshBasicMaterial color={selected ? ACCENT : "#a4a9aa"} />
         </mesh>
         <Html position={[0, 0, 4]} zIndexRange={[10, 0]}>
-          <div className="label-mono whitespace-nowrap text-[9px] text-warning">{part.label} · size unknown</div>
+          <div className="label-mono whitespace-nowrap text-[9px] text-warning">
+            {part.label} · size unknown
+          </div>
         </Html>
       </group>
     );
@@ -184,7 +266,7 @@ function PartMesh({ part, lift }: { part: Part; lift: number }) {
 
   return (
     <group position={pos}>
-      {(
+      {
         <mesh onClick={onClick} castShadow>
           <boxGeometry args={[sx, sy, sz]} />
           <meshStandardMaterial
@@ -196,7 +278,7 @@ function PartMesh({ part, lift }: { part: Part; lift: number }) {
           />
           {(v.showEnvelopes || selected) && <Edges color={selected ? ACCENT : "#3a3f43"} />}
         </mesh>
-      )}
+      }
       {v.mode === "overlay" && showRef && (
         // Reference appearance stand-in (no calibrated Rodin mesh loaded): wireframe, slightly inset.
         <mesh scale={0.97}>

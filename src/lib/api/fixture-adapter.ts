@@ -323,6 +323,7 @@ export function createFixtureAdapter(): BackendAdapter {
       const p = get(id);
       Object.assign(p, Object.fromEntries(Object.entries(prefs).filter(([, v]) => v !== undefined)));
       p.draftVersion++;
+      p.concepts.forEach((c) => { c.stale = true; });
       save();
       return structuredClone(p);
     },
@@ -349,6 +350,7 @@ export function createFixtureAdapter(): BackendAdapter {
       if (draftVersion !== p.draftVersion) throw new ApiError("stale_draft", "Project changed elsewhere — reloaded latest.", 409, true);
       for (const pt of patches) applyPartPatch(p, pt);
       p.draftVersion++;
+      p.concepts.forEach((c) => { c.stale = true; });
       save();
       return structuredClone(p);
     },
@@ -364,6 +366,7 @@ export function createFixtureAdapter(): BackendAdapter {
       const p = get(projectId);
       const c = p.concepts.find((x) => x.id === conceptId);
       if (!c) throw new ApiError("not_found", "Unknown concept.", 404, false);
+      if (c.stale) throw new ApiError("stale_draft", "Your parts or brief changed. Find projects again.", 409, false);
       p.selectedConceptId = conceptId;
       p.goal = c.title;
       p.stage = "confirm";
@@ -422,6 +425,9 @@ export function createFixtureAdapter(): BackendAdapter {
     },
     async getExports() {
       return [];
+    },
+    async getBuildGuide() {
+      throw new ApiError("sample_only", "Assembly guides require a real accepted CAD revision.", 409, false);
     },
     resolveArtifactUrl: (u) => u,
   };

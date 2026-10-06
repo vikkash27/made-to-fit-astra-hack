@@ -40,7 +40,14 @@ export interface JobStatus {
 export interface Evidence {
   partId: string;
   candidates: { identity: string; confidence: number }[];
-  proposals: { field: "x" | "y" | "z"; value: number; sourceId: string }[];
+  proposals: {
+    field: "x" | "y" | "z";
+    value: number;
+    sourceId: string;
+    evidenceId?: string;
+    applicability?: string;
+    acceptance?: string;
+  }[];
   sources: SourceDoc[];
   missing: ("x" | "y" | "z")[];
   sample?: boolean;
@@ -62,6 +69,11 @@ export interface PartPatch {
   size?: Partial<Record<"x" | "y" | "z", { value: number | null; accept: boolean }>>;
   visible?: boolean;
   remove?: boolean;
+  evidenceDecisions?: {
+    evidenceId: string;
+    acceptance: "accepted" | "user_override" | "rejected" | "disputed";
+  }[];
+  crop?: { photoId: string; box: [number, number, number, number] };
 }
 
 export interface Preferences {
@@ -70,11 +82,24 @@ export interface Preferences {
   constraints?: string[];
   goal?: string | null;
   intentMode?: IntentMode;
+  useSetting?: string | null;
+  allowAdditionalParts?: boolean;
+  timeBudget?: string | null;
 }
 
 export interface BackendAdapter {
   readonly mode: "http" | "fixture";
   health(): Promise<Health>;
+  reviewReference?(
+    assetId: string,
+    alignment: {
+      scale: number;
+      position: [number, number, number];
+      rotation?: [number, number, number, number];
+      size?: [number, number, number];
+    },
+  ): Promise<unknown>;
+  getArtifactData?(artifactId: string): Promise<ArrayBuffer>;
   listProjects(): Promise<Pick<Project, "id" | "name" | "goal" | "stage" | "createdAt">[]>;
   createProject(input: CreateProjectInput): Promise<Project>;
   getProject(id: string): Promise<Project>;
@@ -87,14 +112,32 @@ export interface BackendAdapter {
   generateConcepts(projectId: string, draftVersion: number, refinement?: string): Promise<JobRef>;
   listConcepts(projectId: string): Promise<Concept[]>;
   selectConcept(projectId: string, conceptId: string, draftVersion: number): Promise<Project>;
-  agent(projectId: string, input: { text: string; parentRevisionId: string | null; context: string[] }): Promise<JobRef>;
-  createCandidate(projectId: string, parentId: string | null, params: EnclosureParams, locks: string[]): Promise<Revision>;
+  agent(
+    projectId: string,
+    input: { text: string; parentRevisionId: string | null; context: string[] },
+  ): Promise<JobRef>;
+  createCandidate(
+    projectId: string,
+    parentId: string | null,
+    params: EnclosureParams,
+    locks: string[],
+  ): Promise<Revision>;
   buildRevision(revisionId: string): Promise<JobRef>;
-  runChecks(revisionId: string): Promise<JobRef>;
-  acceptRevision(revisionId: string, expectedParentId: string | null, operationId: string): Promise<Revision>;
-  generateReference(projectId: string, partIds: string[], operationId: string): Promise<JobRef>;
+  runChecks(revisionId: string): Promise<JobRef | void>;
+  acceptRevision(
+    revisionId: string,
+    expectedParentId: string | null,
+    operationId: string,
+  ): Promise<Revision>;
+  generateReference(
+    projectId: string,
+    partIds: string[],
+    operationId: string,
+    detail?: "standard" | "detailed",
+  ): Promise<JobRef>;
   getJob(jobId: string): Promise<JobStatus>;
   getExports(revisionId: string): Promise<Artifact[]>;
+  getBuildGuide(revisionId: string): Promise<import("./backend-types").BuildGuideRecord>;
   /** Fixture-only helper; HTTP mode resolves the stored URL. */
   resolveArtifactUrl(url: string): string;
 }

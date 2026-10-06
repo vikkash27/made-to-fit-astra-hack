@@ -23,7 +23,10 @@ export const Route = createFileRoute("/studio/$projectId")({
   head: () => ({
     meta: [
       { title: "Studio — Made to Fit" },
-      { name: "description", content: "Review parts, explore concepts, confirm dimensions and develop your enclosure." },
+      {
+        name: "description",
+        content: "Review parts, explore concepts, confirm dimensions and develop your enclosure.",
+      },
       { property: "og:title", content: "Studio — Made to Fit" },
       { property: "og:description", content: "Your Made to Fit project workspace." },
     ],
@@ -34,7 +37,8 @@ export const Route = createFileRoute("/studio/$projectId")({
 function inferStage(p: Project): Stage {
   if (p.acceptedRevisionId) return "engineer";
   if (p.revisions.length) return "engineer";
-  if (p.goal && p.parts.length && (p.selectedConceptId || p.intentMode === "idea")) return p.selectedConceptId ? "confirm" : "parts";
+  if (p.goal && p.parts.length && (p.selectedConceptId || p.intentMode === "idea"))
+    return p.selectedConceptId ? "confirm" : "parts";
   if (p.concepts.length) return "discover";
   return "parts";
 }
@@ -54,7 +58,13 @@ function available(p: Project, s: Stage) {
   }
 }
 
-const LABEL: Record<Stage, string> = { parts: "Parts", discover: "Explore", confirm: "Dimensions", engineer: "Design", export: "Export" };
+const LABEL: Record<Stage, string> = {
+  parts: "Parts",
+  discover: "Explore",
+  confirm: "Dimensions",
+  engineer: "Design",
+  export: "Print & assemble",
+};
 
 function Studio() {
   const { projectId } = Route.useParams();
@@ -67,15 +77,25 @@ function Studio() {
     resetViewer({ selectedId: null, isolatedId: null, previewRevisionId: null, hidden: {} });
   }, [projectId, resetViewer]);
 
-  const go = (stage: Stage) => navigate({ to: "/studio/$projectId", params: { projectId }, search: { stage } });
+  const go = (stage: Stage) =>
+    navigate({ to: "/studio/$projectId", params: { projectId }, search: { stage } });
 
-  if (q.isPending) return <Shell><div className="label-mono grid flex-1 place-items-center text-muted-foreground">Loading project…</div></Shell>;
+  if (q.isPending)
+    return (
+      <Shell>
+        <div className="label-mono grid flex-1 place-items-center text-muted-foreground">
+          Loading project…
+        </div>
+      </Shell>
+    );
   if (q.isError)
     return (
       <Shell>
         <div className="mx-auto mt-20 max-w-md space-y-4">
           <ErrorNote error={q.error} onRetry={() => q.refetch()} />
-          <Link to="/" className="text-sm underline">Back to studio</Link>
+          <Link to="/" className="text-sm underline">
+            Back to studio
+          </Link>
         </div>
       </Shell>
     );
@@ -86,9 +106,9 @@ function Studio() {
 
   return (
     <Shell>
-      <div className="flex items-center gap-6 border-b border-border/60 px-6 py-2.5 lg:px-9">
+      <div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border/60 px-6 py-2.5 lg:px-9">
         <span className="max-w-[240px] truncate text-sm text-muted-foreground">{p.name}</span>
-        <nav aria-label="Project stages" className="flex gap-1">
+        <nav aria-label="Project stages" className="flex max-w-full gap-1 overflow-x-auto">
           {STAGES.map((s, i) => {
             const ok = available(p, s);
             return (
@@ -97,9 +117,11 @@ function Studio() {
                 disabled={!ok}
                 onClick={() => go(s)}
                 aria-current={stage === s ? "step" : undefined}
-                className={`flex items-center gap-2 rounded-sm px-3 py-1.5 text-[13px] transition-colors disabled:opacity-35 ${stage === s ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-sm px-3 py-1.5 text-[13px] transition-colors disabled:opacity-35 ${stage === s ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
-                <span className={`font-mono text-[11px] ${stage === s ? "text-primary" : ""}`}>{String(i + 1).padStart(2, "0")}</span>
+                <span className={`font-mono text-[11px] ${stage === s ? "text-primary" : ""}`}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 {LABEL[s]}
               </button>
             );
@@ -109,7 +131,9 @@ function Studio() {
           {confirmedCount}/{p.parts.length} parts confirmed · draft v{p.draftVersion}
         </span>
         {stage === "engineer" && (
-          <Btn variant="outline" className="h-8 px-3 text-xs" onClick={() => go("export")}>Export</Btn>
+          <Btn variant="outline" className="h-8 px-3 text-xs" onClick={() => go("export")}>
+            Print & assemble
+          </Btn>
         )}
       </div>
       {stage === "parts" && <PartsStage project={p} startAdding={!!search.add} go={go} />}

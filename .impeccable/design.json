@@ -1,0 +1,493 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T18:52:57.321846+00:00",
+  "title": "Design System: Made to Fit",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Background",
+        "tonalRamp": [
+          "oklch(0.150 0.004 236)",
+          "oklch(0.260 0.004 236)",
+          "oklch(0.380 0.004 236)",
+          "oklch(0.490 0.004 236)",
+          "oklch(0.610 0.004 236)",
+          "oklch(0.720 0.004 236)",
+          "oklch(0.840 0.004 236)",
+          "oklch(0.950 0.004 236)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(0.150 0.006 236)",
+          "oklch(0.260 0.006 236)",
+          "oklch(0.380 0.006 236)",
+          "oklch(0.490 0.006 236)",
+          "oklch(0.610 0.006 236)",
+          "oklch(0.720 0.006 236)",
+          "oklch(0.840 0.006 236)",
+          "oklch(0.950 0.006 236)"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Surface 2",
+        "tonalRamp": [
+          "oklch(0.150 0.007 236)",
+          "oklch(0.260 0.007 236)",
+          "oklch(0.380 0.007 236)",
+          "oklch(0.490 0.007 236)",
+          "oklch(0.610 0.007 236)",
+          "oklch(0.720 0.007 236)",
+          "oklch(0.840 0.007 236)",
+          "oklch(0.950 0.007 236)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Foreground",
+        "tonalRamp": [
+          "oklch(0.150 0.009 95)",
+          "oklch(0.260 0.009 95)",
+          "oklch(0.380 0.009 95)",
+          "oklch(0.490 0.009 95)",
+          "oklch(0.610 0.009 95)",
+          "oklch(0.720 0.009 95)",
+          "oklch(0.840 0.009 95)",
+          "oklch(0.950 0.009 95)"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "tonalRamp": [
+          "oklch(0.150 0.13 45)",
+          "oklch(0.260 0.13 45)",
+          "oklch(0.380 0.13 45)",
+          "oklch(0.490 0.13 45)",
+          "oklch(0.610 0.13 45)",
+          "oklch(0.720 0.13 45)",
+          "oklch(0.840 0.13 45)",
+          "oklch(0.950 0.13 45)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "neutral",
+        "displayName": "Primary foreground",
+        "tonalRamp": [
+          "oklch(0.150 0.01 45)",
+          "oklch(0.260 0.01 45)",
+          "oklch(0.380 0.01 45)",
+          "oklch(0.490 0.01 45)",
+          "oklch(0.610 0.01 45)",
+          "oklch(0.720 0.01 45)",
+          "oklch(0.840 0.01 45)",
+          "oklch(0.950 0.01 45)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Muted foreground",
+        "tonalRamp": [
+          "oklch(0.150 0.007 200)",
+          "oklch(0.260 0.007 200)",
+          "oklch(0.380 0.007 200)",
+          "oklch(0.490 0.007 200)",
+          "oklch(0.610 0.007 200)",
+          "oklch(0.720 0.007 200)",
+          "oklch(0.840 0.007 200)",
+          "oklch(0.950 0.007 200)"
+        ]
+      },
+      "accent": {
+        "role": "neutral",
+        "displayName": "Accent",
+        "tonalRamp": [
+          "oklch(0.150 0.008 236)",
+          "oklch(0.260 0.008 236)",
+          "oklch(0.380 0.008 236)",
+          "oklch(0.490 0.008 236)",
+          "oklch(0.610 0.008 236)",
+          "oklch(0.720 0.008 236)",
+          "oklch(0.840 0.008 236)",
+          "oklch(0.950 0.008 236)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "tonalRamp": [
+          "oklch(0.150 0.008 230)",
+          "oklch(0.260 0.008 230)",
+          "oklch(0.380 0.008 230)",
+          "oklch(0.490 0.008 230)",
+          "oklch(0.610 0.008 230)",
+          "oklch(0.720 0.008 230)",
+          "oklch(0.840 0.008 230)",
+          "oklch(0.950 0.008 230)"
+        ]
+      },
+      "destructive": {
+        "role": "status",
+        "displayName": "Destructive",
+        "tonalRamp": [
+          "oklch(0.150 0.18 25)",
+          "oklch(0.260 0.18 25)",
+          "oklch(0.380 0.18 25)",
+          "oklch(0.490 0.18 25)",
+          "oklch(0.610 0.18 25)",
+          "oklch(0.720 0.18 25)",
+          "oklch(0.840 0.18 25)",
+          "oklch(0.950 0.18 25)"
+        ]
+      },
+      "success": {
+        "role": "status",
+        "displayName": "Success",
+        "tonalRamp": [
+          "oklch(0.150 0.11 155)",
+          "oklch(0.260 0.11 155)",
+          "oklch(0.380 0.11 155)",
+          "oklch(0.490 0.11 155)",
+          "oklch(0.610 0.11 155)",
+          "oklch(0.720 0.11 155)",
+          "oklch(0.840 0.11 155)",
+          "oklch(0.950 0.11 155)"
+        ]
+      },
+      "warning": {
+        "role": "status",
+        "displayName": "Warning",
+        "tonalRamp": [
+          "oklch(0.150 0.13 80)",
+          "oklch(0.260 0.13 80)",
+          "oklch(0.380 0.13 80)",
+          "oklch(0.490 0.13 80)",
+          "oklch(0.610 0.13 80)",
+          "oklch(0.720 0.13 80)",
+          "oklch(0.840 0.13 80)",
+          "oklch(0.950 0.13 80)"
+        ]
+      },
+      "studio-background": {
+        "role": "neutral",
+        "displayName": "Studio background",
+        "tonalRamp": [
+          "oklch(0.150 0.006 90)",
+          "oklch(0.260 0.006 90)",
+          "oklch(0.380 0.006 90)",
+          "oklch(0.490 0.006 90)",
+          "oklch(0.610 0.006 90)",
+          "oklch(0.720 0.006 90)",
+          "oklch(0.840 0.006 90)",
+          "oklch(0.950 0.006 90)"
+        ]
+      },
+      "studio-surface": {
+        "role": "neutral",
+        "displayName": "Studio surface",
+        "tonalRamp": [
+          "oklch(0.150 0 0)",
+          "oklch(0.260 0 0)",
+          "oklch(0.380 0 0)",
+          "oklch(0.490 0 0)",
+          "oklch(0.610 0 0)",
+          "oklch(0.720 0 0)",
+          "oklch(0.840 0 0)",
+          "oklch(0.950 0 0)"
+        ]
+      },
+      "studio-surface-2": {
+        "role": "neutral",
+        "displayName": "Studio surface 2",
+        "tonalRamp": [
+          "oklch(0.150 0.007 90)",
+          "oklch(0.260 0.007 90)",
+          "oklch(0.380 0.007 90)",
+          "oklch(0.490 0.007 90)",
+          "oklch(0.610 0.007 90)",
+          "oklch(0.720 0.007 90)",
+          "oklch(0.840 0.007 90)",
+          "oklch(0.950 0.007 90)"
+        ]
+      },
+      "studio-foreground": {
+        "role": "neutral",
+        "displayName": "Studio foreground",
+        "tonalRamp": [
+          "oklch(0.150 0.006 236)",
+          "oklch(0.260 0.006 236)",
+          "oklch(0.380 0.006 236)",
+          "oklch(0.490 0.006 236)",
+          "oklch(0.610 0.006 236)",
+          "oklch(0.720 0.006 236)",
+          "oklch(0.840 0.006 236)",
+          "oklch(0.950 0.006 236)"
+        ]
+      },
+      "studio-primary": {
+        "role": "primary",
+        "displayName": "Studio primary",
+        "tonalRamp": [
+          "oklch(0.150 0.15 45)",
+          "oklch(0.260 0.15 45)",
+          "oklch(0.380 0.15 45)",
+          "oklch(0.490 0.15 45)",
+          "oklch(0.610 0.15 45)",
+          "oklch(0.720 0.15 45)",
+          "oklch(0.840 0.15 45)",
+          "oklch(0.950 0.15 45)"
+        ]
+      },
+      "studio-secondary": {
+        "role": "neutral",
+        "displayName": "Studio secondary",
+        "tonalRamp": [
+          "oklch(0.150 0.007 90)",
+          "oklch(0.260 0.007 90)",
+          "oklch(0.380 0.007 90)",
+          "oklch(0.490 0.007 90)",
+          "oklch(0.610 0.007 90)",
+          "oklch(0.720 0.007 90)",
+          "oklch(0.840 0.007 90)",
+          "oklch(0.950 0.007 90)"
+        ]
+      },
+      "studio-muted-foreground": {
+        "role": "neutral",
+        "displayName": "Studio muted foreground",
+        "tonalRamp": [
+          "oklch(0.150 0.008 230)",
+          "oklch(0.260 0.008 230)",
+          "oklch(0.380 0.008 230)",
+          "oklch(0.490 0.008 230)",
+          "oklch(0.610 0.008 230)",
+          "oklch(0.720 0.008 230)",
+          "oklch(0.840 0.008 230)",
+          "oklch(0.950 0.008 230)"
+        ]
+      },
+      "studio-accent": {
+        "role": "neutral",
+        "displayName": "Studio accent",
+        "tonalRamp": [
+          "oklch(0.150 0.01 80)",
+          "oklch(0.260 0.01 80)",
+          "oklch(0.380 0.01 80)",
+          "oklch(0.490 0.01 80)",
+          "oklch(0.610 0.01 80)",
+          "oklch(0.720 0.01 80)",
+          "oklch(0.840 0.01 80)",
+          "oklch(0.950 0.01 80)"
+        ]
+      },
+      "studio-border": {
+        "role": "neutral",
+        "displayName": "Studio border",
+        "tonalRamp": [
+          "oklch(0.150 0.008 90)",
+          "oklch(0.260 0.008 90)",
+          "oklch(0.380 0.008 90)",
+          "oklch(0.490 0.008 90)",
+          "oklch(0.610 0.008 90)",
+          "oklch(0.720 0.008 90)",
+          "oklch(0.840 0.008 90)",
+          "oklch(0.950 0.008 90)"
+        ]
+      },
+      "studio-input": {
+        "role": "neutral",
+        "displayName": "Studio input",
+        "tonalRamp": [
+          "oklch(0.150 0.008 90)",
+          "oklch(0.260 0.008 90)",
+          "oklch(0.380 0.008 90)",
+          "oklch(0.490 0.008 90)",
+          "oklch(0.610 0.008 90)",
+          "oklch(0.720 0.008 90)",
+          "oklch(0.840 0.008 90)",
+          "oklch(0.950 0.008 90)"
+        ]
+      },
+      "studio-success": {
+        "role": "status",
+        "displayName": "Studio success",
+        "tonalRamp": [
+          "oklch(0.150 0.12 155)",
+          "oklch(0.260 0.12 155)",
+          "oklch(0.380 0.12 155)",
+          "oklch(0.490 0.12 155)",
+          "oklch(0.610 0.12 155)",
+          "oklch(0.720 0.12 155)",
+          "oklch(0.840 0.12 155)",
+          "oklch(0.950 0.12 155)"
+        ]
+      },
+      "studio-warning": {
+        "role": "status",
+        "displayName": "Studio warning",
+        "tonalRamp": [
+          "oklch(0.150 0.13 70)",
+          "oklch(0.260 0.13 70)",
+          "oklch(0.380 0.13 70)",
+          "oklch(0.490 0.13 70)",
+          "oklch(0.610 0.13 70)",
+          "oklch(0.720 0.13 70)",
+          "oklch(0.840 0.13 70)",
+          "oklch(0.950 0.13 70)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Responsive stage headings; size varies by surface."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Fields, facts and instructions."
+      },
+      "measurement": {
+        "displayName": "Measurement",
+        "purpose": "Dimensions, revision identifiers and structured data."
+      }
+    },
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Tailwind default state transitions used by workspace buttons/navigation."
+      },
+      {
+        "name": "concept-preview-fade",
+        "value": "500ms",
+        "purpose": "Existing concept preview entrance."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "Global reduced-motion override for animations and transitions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Discovery primary action",
+      "kind": "button",
+      "description": "Discovery and its build resources pair orange with graphite text.",
+      "html": "<button class=\"ds-discovery-primary\">Find projects for my parts</button>",
+      "css": ".ds-discovery-primary{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:4px;padding:8px 16px;font-size:14px;line-height:20px;transition:color .15s,background-color .15s,border-color .15s;border:0;background:var(--primary,oklch(0.64 0.15 45));color:var(--foreground,oklch(0.2 0.006 236));}.ds-discovery-primary:hover{background:color-mix(in oklab,var(--primary,oklch(0.64 0.15 45)) 90%,transparent)}.ds-discovery-primary:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}.ds-discovery-primary:disabled{pointer-events:none;opacity:.4}",
+      "refersTo": "button-discovery-primary"
+    },
+    {
+      "name": "Ghost action",
+      "kind": "button",
+      "description": "Secondary workspace action.",
+      "html": "<button class=\"ds-ghost\">Back to parts</button>",
+      "css": ".ds-ghost{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:4px;padding:8px 16px;font-size:14px;line-height:20px;transition:color .15s,background-color .15s,border-color .15s;border:0;background:transparent;color:color-mix(in oklab,var(--foreground,oklch(0.2 0.006 236)) 90%,transparent)}.ds-ghost:hover{background:var(--accent,oklch(0.92 0.01 80))}.ds-ghost:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}.ds-ghost:disabled{pointer-events:none;opacity:.4}",
+      "refersTo": "button-ghost"
+    },
+    {
+      "name": "Outline action",
+      "kind": "button",
+      "description": "Bordered secondary action, including Show parts in 3D.",
+      "html": "<button class=\"ds-outline\">Show parts in 3D</button>",
+      "css": ".ds-outline{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:4px;padding:8px 16px;font-size:14px;line-height:20px;transition:color .15s,background-color .15s,border-color .15s;background:transparent;color:var(--foreground,oklch(0.2 0.006 236));border:1px solid var(--border,oklch(0.88 0.008 90))}.ds-outline:hover{border-color:var(--muted-foreground,oklch(0.48 0.008 230))}.ds-outline:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}.ds-outline:disabled{pointer-events:none;opacity:.4}",
+      "refersTo": "button-outline"
+    },
+    {
+      "name": "Purpose field",
+      "kind": "input",
+      "description": "Label above a native field with theme fill and border.",
+      "html": "<label class=\"ds-field-label\">Where will it live?<input class=\"ds-field\" placeholder=\"Desk, wall, outdoors\u2026\"></label>",
+      "css": ".ds-field-label{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);font-size:14px;line-height:20px;color:var(--foreground,oklch(0.2 0.006 236))}.ds-field{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:block;width:100%;margin-top:8px;border-radius:2px;border:1px solid var(--border,oklch(0.88 0.008 90));background:var(--background,oklch(0.975 0.006 90));color:var(--foreground,oklch(0.2 0.006 236));padding:10px 12px;font-size:14px;line-height:20px}.ds-field::placeholder{color:var(--muted-foreground,oklch(0.48 0.008 230))}.ds-field:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}",
+      "refersTo": "purpose-input"
+    },
+    {
+      "name": "Purpose chip",
+      "kind": "chip",
+      "description": "Pressed choice uses an orange border.",
+      "html": "<button class=\"ds-purpose-chip\" aria-pressed=\"true\">Learn electronics</button>",
+      "css": ".ds-purpose-chip{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);padding:6px 12px;border-radius:9999px;border:1px solid var(--border,oklch(0.88 0.008 90));background:transparent;font-size:12px;line-height:16px;color:var(--muted-foreground,oklch(0.48 0.008 230))}.ds-purpose-chip[aria-pressed=true]{border-color:var(--primary,oklch(0.64 0.15 45));color:var(--foreground,oklch(0.2 0.006 236))}.ds-purpose-chip:hover{color:var(--foreground,oklch(0.2 0.006 236))}.ds-purpose-chip:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}",
+      "refersTo": "purpose-chip"
+    },
+    {
+      "name": "Concept alternative",
+      "kind": "card",
+      "description": "Selected concepts use a border rather than added elevation.",
+      "html": "<button class=\"ds-concept\" aria-pressed=\"true\"><span class=\"ds-concept-number\">01</span><span class=\"ds-concept-title\">Desk project</span><span class=\"ds-concept-detail\">Measurements to review</span></button>",
+      "css": ".ds-concept{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:flex;flex-direction:column;justify-content:center;gap:4px;height:112px;padding:12px 48px 12px 20px;border:1px solid var(--border,oklch(0.88 0.008 90));border-radius:2px;background:var(--surface,oklch(1 0 0));text-align:left;transition:border-color .15s}.ds-concept[aria-pressed=true]{border-color:var(--primary,oklch(0.64 0.15 45))}.ds-concept:hover{border-color:var(--muted-foreground,oklch(0.48 0.008 230))}.ds-concept[aria-pressed=true]:hover{border-color:var(--primary,oklch(0.64 0.15 45))}.ds-concept-number{font-family:var(--font-mono,\"JetBrains Mono\",monospace);font-size:12px;line-height:16px;color:var(--primary,oklch(0.64 0.15 45))}.ds-concept-title{font-size:15px;color:var(--foreground,oklch(0.2 0.006 236))}.ds-concept-detail{font-size:12px;line-height:16px;color:var(--muted-foreground,oklch(0.48 0.008 230))}.ds-concept:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}"
+    },
+    {
+      "name": "Project stage navigation",
+      "kind": "nav",
+      "description": "Sequence remains visible and horizontally scrollable.",
+      "html": "<nav class=\"ds-stages\" aria-label=\"Project stages\"><button class=\"ds-stage\"><span>01</span> Parts</button><button class=\"ds-stage\" aria-current=\"step\"><span>02</span> Explore</button><button class=\"ds-stage\" disabled><span>03</span> Dimensions</button></nav>",
+      "css": ".ds-stages{display:flex;gap:4px;max-width:100%;overflow-x:auto}.ds-stage{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:flex;flex-shrink:0;align-items:center;gap:8px;white-space:nowrap;border:0;border-radius:2px;padding:6px 12px;background:transparent;font-size:13px;color:var(--muted-foreground,oklch(0.48 0.008 230));transition:color .15s,background-color .15s}.ds-stage>span{font-family:var(--font-mono,\"JetBrains Mono\",monospace);font-size:11px}.ds-stage[aria-current=step]{background:var(--accent,oklch(0.92 0.01 80));color:var(--foreground,oklch(0.2 0.006 236))}.ds-stage[aria-current=step]>span{color:var(--primary,oklch(0.64 0.15 45))}.ds-stage:hover{color:var(--foreground,oklch(0.2 0.006 236))}.ds-stage:disabled{opacity:.35}.ds-stage:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}",
+      "refersTo": "stage-navigation-item"
+    },
+    {
+      "name": "Viewer segment control",
+      "kind": "custom",
+      "description": "Compact surface over actual geometry with an active view mode.",
+      "html": "<div class=\"ds-view-modes\" role=\"radiogroup\" aria-label=\"View mode\"><button class=\"ds-view-mode\" role=\"radio\" aria-checked=\"true\">CAD</button><button class=\"ds-view-mode\" role=\"radio\" aria-checked=\"false\">Rendered</button><button class=\"ds-view-mode\" role=\"radio\" aria-checked=\"false\">Overlay</button></div>",
+      "css": ".ds-view-modes{display:flex;gap:0;padding:2px;border-radius:4px;border:1px solid var(--border,oklch(0.88 0.008 90));background:color-mix(in oklab,var(--background,oklch(0.975 0.006 90)) 80%,transparent);backdrop-filter:blur(8px)}.ds-view-mode{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);border:0;border-radius:2px;padding:4px 10px;background:transparent;font-size:12px;line-height:16px;color:var(--muted-foreground,oklch(0.48 0.008 230))}.ds-view-mode[aria-checked=true]{background:var(--accent,oklch(0.92 0.01 80));color:var(--foreground,oklch(0.2 0.006 236))}.ds-view-mode:hover{color:var(--foreground,oklch(0.2 0.006 236))}.ds-view-mode:focus-visible{outline:2px solid var(--ring,oklch(0.64 0.15 45));outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "overview": "Made to Fit preserves its existing physical-product studio interface and voice. The landing page uses graphite, ivory and oxidized orange around the supplied example enclosure image. Project workspaces use warm paper, white surfaces, graphite text and the same orange accent.\n\nSlim borders, compact controls and larger display headings organize the work. Parts, measurements, proposals, appearance references and accepted geometry remain visibly distinguishable.",
+    "keyCharacteristics": [
+      "Graphite/ivory landing and warm-paper studio themes.",
+      "Inter Tight headings, Geist reading text and JetBrains Mono measurements.",
+      "Slim borders, small corners and orange action/selection states.",
+      "Actual accepted geometry beside revision-linked guidance."
+    ],
+    "rules": [
+      {
+        "name": "Theme Boundary",
+        "body": "Use the existing light studio theme for project workspaces and the root graphite theme for the landing page.",
+        "section": "colors"
+      },
+      {
+        "name": "Discovery Action Contrast",
+        "body": "Discovery and its print/assembly resources use graphite foreground on orange primary actions, through the local primary-foreground override.",
+        "section": "colors"
+      },
+      {
+        "name": "Measurement Voice",
+        "body": "Use the mono face for dimensions, revision identifiers and structured data; keep instructions and field labels in the reading face.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do retain existing action names, stage labels and Made to Fit voice.",
+      "Do use the light studio theme and the established discovery action foreground override.",
+      "Do preserve visible focus, loading, error, empty and disabled states.",
+      "Do keep measured envelopes, appearance references and accepted CAD visibly distinct.",
+      "Do preserve scrolling access to instructions and viewer controls on phones."
+    ],
+    "donts": [
+      "Don\u2019t turn concept selection or guide navigation into confirmation of dimensions or acceptance of a design.",
+      "Don\u2019t hide fixture provenance or present appearance references as measured geometry.",
+      "Don\u2019t let explode, X-ray or assembly-step browsing alter geometry, checks or exports.",
+      "Don\u2019t offer downloads or a real assembly guide for sample previews or mismatched revisions."
+    ]
+  }
+}

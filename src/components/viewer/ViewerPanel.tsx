@@ -1,18 +1,42 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 import { Box, Eye, Maximize2, Ruler, ScanLine } from "lucide-react";
-import type { EnclosureParams, Part } from "@/lib/domain/types";
+import type { EnclosureParams, Part, Revision, Project } from "@/lib/domain/types";
 import { useViewer, type CameraPreset, type ViewMode } from "@/lib/store/viewer-store";
 
 const Viewer = lazy(() => import("./Viewer"));
 
-export function ViewerPanel({ parts, params, provenance, compact }: { parts: Part[]; params: EnclosureParams | null; provenance: string; compact?: boolean }) {
-  const fallback = <div className="grid h-full place-items-center label-mono text-muted-foreground">Loading viewer…</div>;
+export function ViewerPanel({
+  parts,
+  params,
+  provenance,
+  compact,
+  revision,
+  visualAssets,
+}: {
+  parts: Part[];
+  params: EnclosureParams | null;
+  provenance: string;
+  compact?: boolean;
+  revision?: Revision | null;
+  visualAssets?: Project["visualAssets"];
+}) {
+  const fallback = (
+    <div className="grid h-full place-items-center label-mono text-muted-foreground">
+      Loading viewer…
+    </div>
+  );
   return (
     <div className="relative h-full w-full">
       <ClientOnly fallback={fallback}>
         <Suspense fallback={fallback}>
-          <Viewer parts={parts} params={params} provenance={provenance} />
+          <Viewer
+            parts={parts}
+            params={params}
+            provenance={provenance}
+            revision={revision}
+            visualAssets={visualAssets}
+          />
         </Suspense>
       </ClientOnly>
       <ViewerToolbar compact={compact} />
@@ -20,9 +44,23 @@ export function ViewerPanel({ parts, params, provenance, compact }: { parts: Par
   );
 }
 
-function Seg<T extends string>({ value, options, onChange, label }: { value: T; options: { v: T; l: string }[]; onChange: (v: T) => void; label: string }) {
+function Seg<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+}: {
+  value: T;
+  options: { v: T; l: string }[];
+  onChange: (v: T) => void;
+  label: string;
+}) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex rounded-md border border-border bg-background/80 p-0.5 backdrop-blur">
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="flex rounded-md border border-border bg-background/80 p-0.5 backdrop-blur"
+    >
       {options.map((o) => (
         <button
           key={o.v}
@@ -38,7 +76,17 @@ function Seg<T extends string>({ value, options, onChange, label }: { value: T; 
   );
 }
 
-function Toggle({ on, onClick, children, label }: { on: boolean; onClick: () => void; children: React.ReactNode; label: string }) {
+function Toggle({
+  on,
+  onClick,
+  children,
+  label,
+}: {
+  on: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  label: string;
+}) {
   return (
     <button
       aria-pressed={on}
@@ -52,7 +100,13 @@ function Toggle({ on, onClick, children, label }: { on: boolean; onClick: () => 
   );
 }
 
-function ViewerToolbar({ compact }: { compact?: boolean }) {
+function ViewerToolbar({
+  compact,
+}: {
+  compact?: boolean;
+  revision?: Revision | null;
+  visualAssets?: Project["visualAssets"];
+}) {
   const v = useViewer();
   return (
     <>
@@ -88,10 +142,18 @@ function ViewerToolbar({ compact }: { compact?: boolean }) {
         <Toggle label="X-ray enclosure" on={v.xray} onClick={() => v.set({ xray: !v.xray })}>
           <ScanLine className="size-3.5" /> X-ray
         </Toggle>
-        <Toggle label="Show dimensions" on={v.showDims} onClick={() => v.set({ showDims: !v.showDims })}>
+        <Toggle
+          label="Show dimensions"
+          on={v.showDims}
+          onClick={() => v.set({ showDims: !v.showDims })}
+        >
           <Ruler className="size-3.5" /> Dims
         </Toggle>
-        <Toggle label="Show envelopes" on={v.showEnvelopes} onClick={() => v.set({ showEnvelopes: !v.showEnvelopes })}>
+        <Toggle
+          label="Show envelopes"
+          on={v.showEnvelopes}
+          onClick={() => v.set({ showEnvelopes: !v.showEnvelopes })}
+        >
           <Box className="size-3.5" /> Envelopes
         </Toggle>
         {v.isolatedId && (
