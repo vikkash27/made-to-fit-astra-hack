@@ -17,8 +17,8 @@ const STAGES: Stage[] = ["parts", "discover", "confirm", "engineer", "export"];
 export const Route = createFileRoute("/studio/$projectId")({
   ssr: false,
   validateSearch: (s: Record<string, unknown>): { stage?: Stage; add?: number } => ({
-    stage: STAGES.includes(s.stage as Stage) ? (s.stage as Stage) : undefined,
-    add: s.add ? 1 : undefined,
+    stage: STAGES.includes(s["stage"] as Stage) ? (s["stage"] as Stage) : undefined,
+    add: s["add"] ? 1 : undefined,
   }),
   head: () => ({
     meta: [
