@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Check, Search } from "lucide-react";
 import type { EnclosureParams, Part, Project, Stage } from "@/lib/domain/types";
@@ -56,6 +56,15 @@ function PartDims({ project, part }: { project: Project; part: Part }) {
   const [draft, setDraft] = useState<Record<string, string>>(() =>
     Object.fromEntries(AXES.map((a) => [a.k, part.size[a.k].value == null ? "" : String(part.size[a.k].value)])),
   );
+  // When a spec lookup brings in new proposed values, fill any still-blank boxes.
+  const sizeKey = AXES.map((a) => part.size[a.k].value ?? "").join("|");
+  useEffect(() => {
+    setDraft((d) => {
+      const next = { ...d };
+      for (const a of AXES) if (!next[a.k] && part.size[a.k].value != null) next[a.k] = String(part.size[a.k].value);
+      return next;
+    });
+  }, [sizeKey]); // eslint-disable-line react-hooks/exhaustive-deps
   const job = project.jobs.find((j) => j.kind === "evidence" && (j.stage === "queued" || j.stage === "running"));
   const evidence = useQuery({
     queryKey: ["evidence", project.id, part.id, project.draftVersion],
