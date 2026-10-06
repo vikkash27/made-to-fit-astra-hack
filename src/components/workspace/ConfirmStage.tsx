@@ -68,7 +68,7 @@ export function ConfirmStage({ project, go }: { project: Project; go: (s: Stage)
             final design.
           </p>
         )}
-        <div className="sticky bottom-0 mt-8 flex flex-wrap items-center gap-3 border-t border-border bg-white py-4">
+        <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-border bg-white py-4">
           <Btn
             variant="primary"
             className="h-11"

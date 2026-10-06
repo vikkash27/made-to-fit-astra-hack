@@ -1,4 +1,28 @@
-# Prompt for the UI/UX agent
+# UI/UX redesign handoff
+
+## Completed implementation — 6 October 2026
+
+The redesign is implemented. The prompt below is retained as the original brief; later user steering takes precedence: white builder/viewer, existing orange accent, automatic detailed component appearance generation without provider/payment wording, and no Astra label in the corner connection status.
+
+The five stages now have distinct task headings, primary actions, large artifact areas and dependency-aware navigation. Photo regions and cropped part rows select a review form; required identity/dimension review is explicit. Optional preferences, history and advanced controls are disclosed. Astra is available contextually as a wide-screen dock or a narrower-screen accessible drawer, with retained drafts, readable actual responses and working artifact links. Print and assembly share the accepted revision, and the combined 3MF is the recommended download. User measurements, real backend results, explicit acceptance and P2S exports remain authoritative.
+
+Shipped design: **DESIGN.md**, **.impeccable/design.json**, and **.impeccable/workspace-redesign.md**. The finish reviewer confirmed resolution of measurement overlap, active mobile step visibility, selected part review continuity, irrelevant historical dimension failure, and print action hierarchy. The design contract explicitly records a process limitation: no randomized concept roll, corroborated seed or QUALITY BAR card was created.
+
+Live proof used labelled independent data on 8003/5175, including actual photo analysis, component GLBs, grounded concept selection, measurement confirmation, native CAD, deliberate failed-check recovery, explicit acceptance, real 3MF download, alignment review, guide progress and a contextual Astra reply. A second, fresh two-photo HttpAdapter intake returned seven proposed parts with all dimensions still unknown. Original user measurements were not replaced. Browser-native file-picker automation was unavailable; uploads/analysis were verified through BackendAdapter and frontend tests. See **CONTINUITY.md** for exact proof IDs and the remaining physical/slicer review scope.
+
+Before/after capture index (local, ignored; all under `.impeccable/review/`):
+
+- `before-desktop.jpg`, `before-mobile.jpg`
+- `after-home-desktop.jpg`, `after-home-mobile.jpg`, `after-home-corner-status.jpg`
+- `after-parts-desktop.jpg`, `after-parts-mobile.jpg`, `after-review-focus-mobile.jpg`
+- `after-discover-desktop.jpg`, `after-discover-mobile.jpg`
+- `after-measure-desktop.jpg`, `after-measure-mobile.jpg`
+- `after-builder-desktop.jpg`, `after-builder-mobile.jpg`, `after-astra-mobile.jpg`
+- `after-print-desktop.jpg`, `after-print-mobile.jpg`
+
+Final validation: 52 frontend tests and 44 backend tests pass; TypeScript and production build pass. Changed UI lint has no errors, with one incumbent Fast Refresh warning. Existing large Three.js bundle, tsconfig-paths and Starlette/httpx advisories remain. Verified checkpoints are normal commits on main; preserve published Lovable history.
+
+## Original redesign brief
 
 Copy the following prompt into the next agent chat:
 

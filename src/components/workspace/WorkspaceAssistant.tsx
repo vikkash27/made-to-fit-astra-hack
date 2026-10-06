@@ -84,7 +84,7 @@ export function WorkspaceAssistant({
           onClick={() => (open ? close() : show())}
           aria-expanded={open}
           aria-controls="workspace-astra"
-          className="inline-flex min-h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-medium text-primary hover:bg-primary/15"
+          className="inline-flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-accent px-4 text-sm font-medium text-primary hover:bg-primary/15"
         >
           <MessageCircle className="size-4" />{" "}
           {open

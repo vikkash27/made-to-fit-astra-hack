@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Project, Stage } from "@/lib/domain/types";
 import { useProject } from "@/lib/api/hooks";
 import { buildParts } from "@/lib/domain/build-parts";
@@ -19,6 +19,33 @@ import { ExportStage } from "@/components/workspace/ExportStage";
 import { Btn, ErrorNote } from "@/components/workspace/ui";
 
 const STAGES: Stage[] = ["parts", "discover", "confirm", "engineer", "export"];
+
+function StageNavigation({ stage, children }: { stage: Stage; children: ReactNode }) {
+  const navRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const reveal = () => {
+      const nav = navRef.current;
+      const current = nav?.querySelector<HTMLElement>('[aria-current="step"]');
+      if (nav && current)
+        nav.scrollTo({
+          left: Math.max(0, current.offsetLeft - (nav.clientWidth - current.offsetWidth) / 2),
+          behavior: "auto",
+        });
+    };
+    reveal();
+    window.addEventListener("resize", reveal);
+    return () => window.removeEventListener("resize", reveal);
+  }, [stage]);
+  return (
+    <nav
+      ref={navRef}
+      aria-label="Project stages"
+      className="relative mt-2 flex gap-2 overflow-x-auto pb-2"
+    >
+      {children}
+    </nav>
+  );
+}
 
 export const Route = createFileRoute("/studio/$projectId")({
   ssr: false,
@@ -116,7 +143,7 @@ function Studio() {
             draft {p.draftVersion}
           </span>
         </div>
-        <nav aria-label="Project stages" className="mt-2 flex gap-2 overflow-x-auto pb-2">
+        <StageNavigation stage={stage}>
           {STAGES.map((s, i) => {
             const access = stageAccess(p, s);
             const active = stage === s;
@@ -147,7 +174,7 @@ function Studio() {
               </button>
             );
           })}
-        </nav>
+        </StageNavigation>
       </div>
       <WorkspaceAssistant key={p.id} project={p} stage={stage}>
         {(blocked || (search.stage && !stageAccess(p, search.stage).allowed)) && (

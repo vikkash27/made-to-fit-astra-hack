@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T19:28:34.884959+00:00",
+  "title": "Design System: Made to Fit \u2014 interactive assembly extension",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "White background",
+        "tonalRamp": [
+          "oklch(0.15 0.00000 0.00)",
+          "oklch(0.26 0.00000 0.00)",
+          "oklch(0.38 0.00000 0.00)",
+          "oklch(0.49 0.00000 0.00)",
+          "oklch(0.61 0.00000 0.00)",
+          "oklch(0.72 0.00000 0.00)",
+          "oklch(0.84 0.00000 0.00)",
+          "oklch(0.95 0.00000 0.00)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White surface",
+        "tonalRamp": [
+          "oklch(0.15 0.00000 0.00)",
+          "oklch(0.26 0.00000 0.00)",
+          "oklch(0.38 0.00000 0.00)",
+          "oklch(0.49 0.00000 0.00)",
+          "oklch(0.61 0.00000 0.00)",
+          "oklch(0.72 0.00000 0.00)",
+          "oklch(0.84 0.00000 0.00)",
+          "oklch(0.95 0.00000 0.00)"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Cool pale surface",
+        "tonalRamp": [
+          "oklch(0.15 0.00171 247.84)",
+          "oklch(0.26 0.00171 247.84)",
+          "oklch(0.38 0.00171 247.84)",
+          "oklch(0.49 0.00171 247.84)",
+          "oklch(0.61 0.00171 247.84)",
+          "oklch(0.72 0.00171 247.84)",
+          "oklch(0.84 0.00171 247.84)",
+          "oklch(0.95 0.00171 247.84)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Graphite ink",
+        "tonalRamp": [
+          "oklch(0.15 0.00600 236.00)",
+          "oklch(0.26 0.00600 236.00)",
+          "oklch(0.38 0.00600 236.00)",
+          "oklch(0.49 0.00600 236.00)",
+          "oklch(0.61 0.00600 236.00)",
+          "oklch(0.72 0.00600 236.00)",
+          "oklch(0.84 0.00600 236.00)",
+          "oklch(0.95 0.00600 236.00)"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Studio orange",
+        "tonalRamp": [
+          "oklch(0.15 0.15618 39.56)",
+          "oklch(0.26 0.15618 39.56)",
+          "oklch(0.38 0.15618 39.56)",
+          "oklch(0.49 0.15618 39.56)",
+          "oklch(0.61 0.15618 39.56)",
+          "oklch(0.72 0.15618 39.56)",
+          "oklch(0.84 0.15618 39.56)",
+          "oklch(0.95 0.15618 39.56)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "neutral",
+        "displayName": "White action text",
+        "tonalRamp": [
+          "oklch(0.15 0.00000 0.00)",
+          "oklch(0.26 0.00000 0.00)",
+          "oklch(0.38 0.00000 0.00)",
+          "oklch(0.49 0.00000 0.00)",
+          "oklch(0.61 0.00000 0.00)",
+          "oklch(0.72 0.00000 0.00)",
+          "oklch(0.84 0.00000 0.00)",
+          "oklch(0.95 0.00000 0.00)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Pale neutral grouping",
+        "tonalRamp": [
+          "oklch(0.15 0.00171 247.84)",
+          "oklch(0.26 0.00171 247.84)",
+          "oklch(0.38 0.00171 247.84)",
+          "oklch(0.49 0.00171 247.84)",
+          "oklch(0.61 0.00171 247.84)",
+          "oklch(0.72 0.00171 247.84)",
+          "oklch(0.84 0.00171 247.84)",
+          "oklch(0.95 0.00171 247.84)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Supporting graphite",
+        "tonalRamp": [
+          "oklch(0.15 0.00800 230.00)",
+          "oklch(0.26 0.00800 230.00)",
+          "oklch(0.38 0.00800 230.00)",
+          "oklch(0.49 0.00800 230.00)",
+          "oklch(0.61 0.00800 230.00)",
+          "oklch(0.72 0.00800 230.00)",
+          "oklch(0.84 0.00800 230.00)",
+          "oklch(0.95 0.00800 230.00)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Pale orange hover",
+        "tonalRamp": [
+          "oklch(0.15 0.01857 51.98)",
+          "oklch(0.26 0.01857 51.98)",
+          "oklch(0.38 0.01857 51.98)",
+          "oklch(0.49 0.01857 51.98)",
+          "oklch(0.61 0.01857 51.98)",
+          "oklch(0.72 0.01857 51.98)",
+          "oklch(0.84 0.01857 51.98)",
+          "oklch(0.95 0.01857 51.98)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Fine cool divider",
+        "tonalRamp": [
+          "oklch(0.15 0.00631 255.48)",
+          "oklch(0.26 0.00631 255.48)",
+          "oklch(0.38 0.00631 255.48)",
+          "oklch(0.49 0.00631 255.48)",
+          "oklch(0.61 0.00631 255.48)",
+          "oklch(0.72 0.00631 255.48)",
+          "oklch(0.84 0.00631 255.48)",
+          "oklch(0.95 0.00631 255.48)"
+        ]
+      },
+      "destructive": {
+        "role": "status",
+        "displayName": "Request error",
+        "tonalRamp": [
+          "oklch(0.15 0.18000 25.00)",
+          "oklch(0.26 0.18000 25.00)",
+          "oklch(0.38 0.18000 25.00)",
+          "oklch(0.49 0.18000 25.00)",
+          "oklch(0.61 0.18000 25.00)",
+          "oklch(0.72 0.18000 25.00)",
+          "oklch(0.84 0.18000 25.00)",
+          "oklch(0.95 0.18000 25.00)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Active title",
+        "purpose": "Active assembly step and wiring section heading."
+      },
+      "section": {
+        "displayName": "Guide heading",
+        "purpose": "Current interactive guide title."
+      },
+      "body": {
+        "displayName": "Instruction text",
+        "purpose": "Instructions, connection review and controls."
+      },
+      "supporting": {
+        "displayName": "Supporting text",
+        "purpose": "Status, captions and helper copy."
+      },
+      "measurement": {
+        "displayName": "Measured data",
+        "purpose": "Dimensions and elapsed time."
+      },
+      "pin": {
+        "displayName": "Exact pin label",
+        "purpose": "Readable endpoint identifiers."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "button-color-transition",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Inherited shared workspace button state changes."
+      },
+      {
+        "name": "active-job-spinner",
+        "value": "1s linear infinite",
+        "purpose": "Active job indicator only; disabled with reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Inherited workspace action with explicit hover, disabled and keyboard focus states.",
+      "html": "<button class=\"ds-button-primary\">Show step in 3D</button>",
+      "css": ".ds-button-primary{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;border-radius:9999px;padding:8px 16px;font-size:14px;line-height:20px;font-weight:500;cursor:pointer;transition:color .15s,background-color .15s,border-color .15s;border:0;background:var(--primary,#b9481c);color:var(--primary-foreground,#fff);}.ds-button-primary:hover{background:color-mix(in oklab,var(--primary,#b9481c) 90%,transparent);}.ds-button-primary:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}.ds-button-primary:disabled{pointer-events:none;opacity:.4;} @media(prefers-reduced-motion:reduce){.ds-button-primary{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Outline action",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Inherited workspace action with explicit hover, disabled and keyboard focus states.",
+      "html": "<button class=\"ds-button-outline\">Show step in 3D</button>",
+      "css": ".ds-button-outline{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;border-radius:9999px;padding:8px 16px;font-size:14px;line-height:20px;font-weight:500;cursor:pointer;transition:color .15s,background-color .15s,border-color .15s;border:1px solid var(--border,#e4e7eb);background:transparent;color:var(--foreground,oklch(0.2 0.006 236));}.ds-button-outline:hover{border-color:var(--muted-foreground,oklch(0.48 0.008 230));}.ds-button-outline:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}.ds-button-outline:disabled{pointer-events:none;opacity:.4;} @media(prefers-reduced-motion:reduce){.ds-button-outline{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Ghost action",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Inherited workspace action with explicit hover, disabled and keyboard focus states.",
+      "html": "<button class=\"ds-button-ghost\">Show step in 3D</button>",
+      "css": ".ds-button-ghost{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;border-radius:9999px;padding:8px 16px;font-size:14px;line-height:20px;font-weight:500;cursor:pointer;transition:color .15s,background-color .15s,border-color .15s;border:0;background:transparent;color:color-mix(in oklab,var(--foreground,oklch(0.2 0.006 236)) 90%,transparent);}.ds-button-ghost:hover{background:var(--accent,#fff1e9);}.ds-button-ghost:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}.ds-button-ghost:disabled{pointer-events:none;opacity:.4;} @media(prefers-reduced-motion:reduce){.ds-button-ghost{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Documentation input",
+      "kind": "input",
+      "description": "Optional source URLs with a visible research path.",
+      "html": "<label class=\"ds-doc-label\">Manufacturer documentation URLs <span>(optional)</span><textarea class=\"ds-doc-input\" rows=\"2\" placeholder=\"One HTTPS pinout or module documentation URL per line. Leave blank to search.\"></textarea></label>",
+      "css": ".ds-doc-label{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);font-size:14px;line-height:20px;color:var(--foreground,oklch(.2 .006 236));display:block;}.ds-doc-label span{color:var(--muted-foreground,oklch(.48 .008 230));}.ds-doc-input{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);margin-top:8px;width:100%;border:1px solid var(--border,#e4e7eb);border-radius:16px;background:var(--background,#fff);color:var(--foreground,oklch(.2 .006 236));padding:12px;font-size:14px;line-height:20px;caret-color:var(--primary,#b9481c);}.ds-doc-input:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}.ds-doc-input::placeholder{color:var(--muted-foreground,oklch(.48 .008 230));}",
+      "refersTo": "documentation-input"
+    },
+    {
+      "name": "Numbered assembly navigation",
+      "kind": "nav",
+      "description": "Order carries the actual assembly sequence.",
+      "html": "<nav class=\"ds-step-nav\" aria-label=\"Choose assembly step\"><button aria-label=\"Step 1: Prepare\">1</button><button aria-label=\"Step 2: Place components\" aria-current=\"step\">2</button><button aria-label=\"Step 3: Close enclosure\">3</button></nav>",
+      "css": ".ds-step-nav{display:flex;flex-wrap:wrap;gap:8px;}.ds-step-nav button{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-size:14px;line-height:20px;border:1px solid var(--border,#e4e7eb);border-radius:9999px;background:transparent;color:var(--foreground,oklch(.2 .006 236));cursor:pointer;}.ds-step-nav button:hover{background:var(--secondary,#f4f5f6);}.ds-step-nav button[aria-current=step]{border-color:var(--primary,#b9481c);background:var(--primary,#b9481c);color:var(--primary-foreground,#fff);}.ds-step-nav button:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}",
+      "refersTo": "step-navigation"
+    },
+    {
+      "name": "Completion check",
+      "kind": "card",
+      "description": "An explicit check after the instruction.",
+      "html": "<div class=\"ds-check\"><p class=\"ds-check-title\">Check before continuing</p><p class=\"ds-check-copy\">Confirm this step against the accepted guide.</p><label class=\"ds-check-label\"><input type=\"checkbox\">I completed this step and its check</label></div>",
+      "css": ".ds-check{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);border-radius:16px;background:var(--secondary,#f4f5f6);color:var(--foreground,oklch(.2 .006 236));padding:16px;font-size:14px;line-height:20px;}.ds-check-title{margin:0;font-weight:500;}.ds-check-copy{margin:8px 0 0;line-height:1.625;}.ds-check-label{margin-top:16px;display:flex;align-items:flex-start;gap:12px;}.ds-check-label input:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}.ds-check-label input:disabled{cursor:not-allowed;}",
+      "refersTo": "check-container"
+    },
+    {
+      "name": "Measured layout legend",
+      "kind": "custom",
+      "description": "Full part names and dimensions remain readable below scaled geometry.",
+      "html": "<ol class=\"ds-legend\" aria-label=\"Measured layout parts\"><li><button><span class=\"ds-legend-number\">2.</span><span class=\"ds-legend-name\">Measured component envelope<span class=\"ds-legend-size\">Dimensions from the accepted revision \u00b7 mm</span></span></button></li></ol>",
+      "css": ".ds-legend{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);list-style:none;padding:0;margin:0 0 16px;color:var(--foreground,oklch(.2 .006 236));}.ds-legend button{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:flex;width:100%;align-items:flex-start;gap:12px;border:0;border-radius:16px;padding:8px;text-align:left;background:transparent;color:inherit;font-size:14px;line-height:20px;cursor:pointer;}.ds-legend button:hover{background:var(--secondary,#f4f5f6);}.ds-legend button:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}.ds-legend-number{font-family:var(--font-mono,\"JetBrains Mono\",ui-monospace,monospace);}.ds-legend-name{min-width:0;overflow-wrap:break-word;font-weight:500;}.ds-legend-size{display:block;margin-top:4px;font-weight:400;color:var(--muted-foreground,oklch(.48 .008 230));}"
+    },
+    {
+      "name": "Responsive wiring endpoints",
+      "kind": "custom",
+      "description": "Schematic labels wrap as HTML; positions are not physical pin positions.",
+      "html": "<div class=\"ds-wire\"><div class=\"ds-wire-end\"><p>Exact start module</p><p class=\"ds-wire-pin\">GND</p></div><svg class=\"ds-wire-horizontal\" aria-hidden=\"true\" viewBox=\"0 0 48 80\"><path d=\"M 0 40 H 12 V 20 H 36 V 40 H 48\"/></svg><svg class=\"ds-wire-vertical\" aria-hidden=\"true\" viewBox=\"0 0 80 48\"><path d=\"M 40 0 V 12 H 60 V 36 H 40 V 48\"/></svg><div class=\"ds-wire-end\"><p>Exact end module</p><p class=\"ds-wire-pin\">GND</p></div></div>",
+      "css": ".ds-wire{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);display:grid;align-items:center;margin:20px 0;color:var(--foreground,oklch(.2 .006 236));}.ds-wire-end{min-width:0;border:1px solid var(--border,#e4e7eb);border-radius:16px;background:var(--secondary,#f4f5f6);padding:16px;text-align:center;}.ds-wire-end p{margin:0;overflow-wrap:break-word;font-size:14px;line-height:20px;font-weight:500;}.ds-wire-end .ds-wire-pin{margin-top:12px;font-family:var(--font-mono,\"JetBrains Mono\",ui-monospace,monospace);font-size:16px;line-height:24px;font-weight:400;overflow-wrap:anywhere;}.ds-wire svg{justify-self:center;}.ds-wire path{fill:none;stroke:#262626;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;}.ds-wire-horizontal{display:none;width:48px;height:80px;}.ds-wire-vertical{width:80px;height:48px;}@media(min-width:640px){.ds-wire{grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);}.ds-wire-horizontal{display:block;}.ds-wire-vertical{display:none;}}",
+      "refersTo": "wiring-endpoint"
+    },
+    {
+      "name": "Source evidence",
+      "kind": "custom",
+      "description": "A document title and quotation explain the active connection.",
+      "html": "<details class=\"ds-evidence\"><summary>Pinout evidence for this connection</summary><p class=\"ds-evidence-location\">Module \u00b7 documented pinout location</p><blockquote>Verified source excerpt appears here.</blockquote><a href=\"#source-document\">Manufacturer document title</a></details>",
+      "css": ".ds-evidence{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);margin-top:12px;color:var(--foreground,oklch(.2 .006 236));font-size:14px;line-height:20px;}.ds-evidence summary{cursor:pointer;}.ds-evidence summary:focus-visible,.ds-evidence a:focus-visible{outline:2px solid var(--ring,#b9481c);outline-offset:2px;}.ds-evidence-location{margin:12px 0 0;font-weight:500;}.ds-evidence blockquote{margin:8px 0;border-left:1px solid var(--border,#e4e7eb);padding-left:12px;color:var(--muted-foreground,oklch(.48 .008 230));}.ds-evidence a{color:inherit;overflow-wrap:break-word;text-decoration:underline;}"
+    },
+    {
+      "name": "Job progress",
+      "kind": "custom",
+      "description": "Human-readable stage and non-announced ticking time.",
+      "html": "<div class=\"ds-job\"><div class=\"ds-job-stage\" role=\"status\"><svg class=\"ds-job-spinner\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3a9 9 0 1 0 9 9\"/></svg><span>Wiring plan \u00b7 Reading pinout documentation</span></div><p class=\"ds-job-time\" aria-live=\"off\">Elapsed 00:12</p></div>",
+      "css": ".ds-job{font-family:var(--font-sans,\"Geist\",ui-sans-serif,system-ui,sans-serif);border:1px solid var(--border,#e4e7eb);border-radius:8px;background:color-mix(in oklab,var(--background,#fff) 95%,transparent);padding:12px;color:var(--muted-foreground,oklch(.48 .008 230));font-size:14px;line-height:20px;}.ds-job-stage{display:flex;align-items:center;gap:8px;}.ds-job-spinner{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;animation:ds-job-spin 1s linear infinite;}.ds-job-time{margin:4px 0 0;font-family:var(--font-mono,\"JetBrains Mono\",ui-monospace,monospace);font-size:12px;line-height:16px;font-variant-numeric:tabular-nums;}@keyframes ds-job-spin{to{transform:rotate(360deg);}}@media(prefers-reduced-motion:reduce){.ds-job-spinner{animation:none;}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Made to Fit physical-product studio",
+    "overview": "This assembly extension inherits the Made to Fit physical-product studio in [the root design system](../../DESIGN.md). Its shipped light workspace uses white surfaces, graphite reading text and a restrained orange action accent. This document applies only to BuildGuide, AssemblyDiagram, WiringPanel, WiringDiagram and their JobProgress presentation; it does not redefine the shell, viewer or assistant.\n\nThe source is the authority for inherited values: the current light overrides in `src/styles.css` differ from several values in the incumbent root document. The frontmatter below records those currently used overrides at this fresh boundary. The extension presents practical instructions through readable text, ordered controls and explicitly labelled diagrams; its identity is inherited, not a new visual world.",
+    "keyCharacteristics": [
+      "White studio surfaces with orange action and selection states.",
+      "Geist instructions, medium-weight headings and mono measurements or pin labels.",
+      "Flat tonal checks, wrapping pill controls and numbered assembly navigation.",
+      "Measured-envelope legends and source-backed connection schematics with readable labels."
+    ],
+    "rules": [
+      {
+        "name": "Action Accent Rule",
+        "body": "Orange identifies actions and current selection; instructions and evidence remain graphite on neutral surfaces. Connection-line colors identify suggested wire labels, not additional brand accents.",
+        "section": "colors"
+      },
+      {
+        "name": "Readable Label Rule",
+        "body": "Keep module names in the reading face and pin identifiers or measured dimensions in mono. Full labels wrap in HTML rather than shrinking inside a scalable diagram.",
+        "section": "typography"
+      },
+      {
+        "name": "Heading First Rule",
+        "body": "The active step heading precedes its step count and review status. Sequence numbers belong to the navigation because assembly order carries meaning.",
+        "section": "typography"
+      },
+      {
+        "name": "Flat Guidance Rule",
+        "body": "Separate instructions with borders, whitespace and neutral tonal fills. The assembly extension adds no shadow vocabulary.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do inherit the current light studio custom properties and shared workspace buttons.",
+      "Do keep step status below the heading and show full part and pin names on phones.",
+      "Do provide textual labels and evidence alongside schematic color.",
+      "Do retain loading, saving, error, disabled and keyboard-focus states.",
+      "Do keep measured envelopes, display-only appearance previews and reviewed wiring distinct."
+    ],
+    "donts": [
+      "Don't replace full endpoint names with shortened SVG labels.",
+      "Don't infer physical pin positions from a connection schematic or dimensions from an appearance model.",
+      "Don't use navigation or viewing a source as a completed check or user review.",
+      "Don't broaden this extension document into rules for the shell, viewer or assistant."
+    ]
+  }
+}

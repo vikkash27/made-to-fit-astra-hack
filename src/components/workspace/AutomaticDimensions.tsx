@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Project } from "@/lib/domain/types";
 import { partFullyConfirmed } from "@/lib/domain/dimensions";
+import { buildParts } from "@/lib/domain/build-parts";
 import { getAdapter } from "@/lib/api";
 import { useProjectAction } from "@/lib/api/hooks";
 import { latestJob } from "@/lib/domain/job-timing";
@@ -9,7 +10,7 @@ import { Btn, ErrorNote } from "./ui";
 
 export function AutomaticDimensions({ project }: { project: Project }) {
   const attempted = useRef(false);
-  const missing = project.parts.filter(
+  const missing = buildParts(project).filter(
     (p) =>
       p.identityAccepted && p.photoId && p.anchor && !partFullyConfirmed(p) && !p.dimensionEstimate,
   );
@@ -35,11 +36,15 @@ export function AutomaticDimensions({ project }: { project: Project }) {
     attempted.current = true;
     mutate([`dimensions-v1-${project.id}-${signature}`]);
   }, [signature, project.id, job, mutate, isPending]);
-  if (getAdapter().mode !== "http") return null;
+  if (getAdapter().mode !== "http" || missing.length === 0) return null;
   return (
     <div className="mt-5 space-y-3">
-      {job && (job.stage === "queued" || job.stage === "running" || job.stage === "failed") && (
-        <JobProgress job={job} />
+      {job && (job.stage === "queued" || job.stage === "running") && <JobProgress job={job} />}
+      {job?.stage === "failed" && (
+        <p role="status" className="text-sm text-muted-foreground">
+          We couldn’t estimate these sizes. Try again, look up the specifications, or enter your
+          measurements.
+        </p>
       )}
       <ErrorNote error={generate.error} />
       {missing.length > 0 &&

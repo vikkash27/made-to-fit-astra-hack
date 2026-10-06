@@ -4,6 +4,10 @@ import { stageAccess } from "@/lib/domain/stage-access";
 import { referenceToGenerate } from "@/lib/domain/automatic-references";
 import { Composer } from "@/components/studio/Composer";
 import { AstraMarkdown } from "@/components/workspace/AstraMarkdown";
+import { AutomaticDimensions } from "@/components/workspace/AutomaticDimensions";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as api from "@/lib/api";
+import type { BackendAdapter } from "@/lib/api/adapter";
 import type { Project } from "@/lib/domain/types";
 
 const project = {
@@ -23,7 +27,59 @@ const project = {
   concepts: [],
   selectedConceptId: null,
 } as unknown as Project;
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+it("does not estimate spare parts or show an old failure after all used dimensions are confirmed", () => {
+  const estimateDimensions = vi.fn();
+  vi.spyOn(api, "getAdapter").mockReturnValue({
+    mode: "http",
+    estimateDimensions,
+  } as unknown as BackendAdapter);
+  const confirmed = { value: 10, status: "accepted" };
+  const p = {
+    ...project,
+    id: "confirmed-build",
+    selectedConceptId: "chosen",
+    concepts: [{ id: "chosen", partsUsed: ["board"] }],
+    parts: [
+      {
+        ...project.parts[0],
+        status: "accepted",
+        identityAccepted: "Board",
+        size: { x: confirmed, y: confirmed, z: confirmed },
+      },
+      {
+        ...project.parts[0],
+        id: "spare",
+        identityAccepted: "Spare",
+        status: "proposed",
+        size: {
+          x: { value: null, status: "unknown" },
+          y: { value: null, status: "unknown" },
+          z: { value: null, status: "unknown" },
+        },
+      },
+    ],
+    jobs: [
+      {
+        id: "old-failure",
+        kind: "dimensions",
+        stage: "failed",
+        startedAt: 1,
+        error: "Provider unavailable",
+      },
+    ],
+  } as unknown as Project;
+  const { container } = render(
+    <QueryClientProvider client={new QueryClient()}>
+      <AutomaticDimensions project={p} />
+    </QueryClientProvider>,
+  );
+  expect(container).toBeEmptyDOMElement();
+  expect(estimateDimensions).not.toHaveBeenCalled();
+});
 describe("workspace dependencies", () => {
   it("explains part review and links to the step that resolves it", () => {
     expect(stageAccess(project, "discover")).toMatchObject({ allowed: false, resolve: "parts" });

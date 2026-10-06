@@ -79,7 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Made to Fit" },
-      { name: "description", content: "Turn the hardware you have into projects and printable enclosures." },
+      {
+        name: "description",
+        content: "Turn the hardware you have into projects and printable enclosures.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -107,6 +110,18 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <template
+          dangerouslySetInnerHTML={{
+            __html: `<!--
+THESIS: Make the next build action clear while real photos and geometry lead.
+OWN-WORLD: White workspace, existing orange actions, soft controls, graphite home.
+STORY: Review parts, choose a purpose, confirm measurements, check and accept CAD, print and assemble.
+FIRST VIEWPORT: Current step and task heading precede the artifact; contextual help stays available.
+FORM: Product workbench extended from the existing brand under the user's white-and-orange direction. No randomized concept roll was performed.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+-->`,
+          }}
+        />
         {children}
         <Scripts />
       </body>

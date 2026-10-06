@@ -13,3 +13,14 @@ Home must explain: turn electronics parts into grounded project plans and custom
 User steering: remove provider and payment wording from the UI. Create detailed appearance files automatically only for reviewed photo parts. Stable operation IDs and existing-job detection prevent repeat or unknown submissions. Appearance never establishes measured fit. Keep backend provider identifiers internal.
 
 Verification: desktop and phone evidence, browser functional journey, frontend tests/type-check/build, native CAD and accepted artifact checks in isolated test data. The assembly-guide chat owns BuildGuide, wiring components and backend typed additions; avoid overwriting them.
+
+## Shipped direction contract
+
+THESIS: Make the next build action clear while real photos and geometry lead.
+OWN-WORLD: White workspace, existing orange actions, soft controls, graphite home.
+STORY: Review parts, choose a purpose, confirm measurements, check and accept CAD, print and assemble.
+FIRST VIEWPORT: Current step and task heading precede the artifact; contextual help stays available.
+FORM: Product workbench extended from the existing brand under the user's white-and-orange direction. No randomized concept roll was performed; there is no corroborated roll seed or quality-card record to claim.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+
+The inert root template emits this contract in the document. Existing product rasters remain source assets; this redesign generated no new raster artwork. Authentic CAD and generated component assets are backend artifacts, not shipping illustration assets.

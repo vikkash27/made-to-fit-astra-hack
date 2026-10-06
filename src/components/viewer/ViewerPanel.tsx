@@ -28,7 +28,7 @@ export function ViewerPanel({
   );
   return (
     <div className="flex h-full min-h-0 w-full flex-col bg-white">
-      <ViewerToolbar compact={compact} position="top" />
+      <ViewerToolbar compact={compact} position="top" revision={revision} />
       <div className="relative min-h-0 flex-1">
         <ClientOnly fallback={fallback}>
           <Suspense fallback={fallback}>
@@ -42,7 +42,7 @@ export function ViewerPanel({
           </Suspense>
         </ClientOnly>
       </div>
-      <ViewerToolbar compact={compact} position="bottom" />
+      <ViewerToolbar compact={compact} position="bottom" revision={revision} />
     </div>
   );
 }
@@ -102,6 +102,7 @@ function Toggle({
 function ViewerToolbar({
   compact,
   position,
+  revision,
 }: {
   compact?: boolean;
   position: "top" | "bottom";
@@ -183,7 +184,9 @@ function ViewerToolbar({
       {position === "bottom" && (
         <p className="px-3 pb-3 text-xs leading-relaxed text-muted-foreground">
           {v.mode === "rendered"
-            ? "Generated component models appear automatically. Before CAD is built, models are arranged for inspection, not at physical scale. Fit checks use confirmed dimensions."
+            ? revision?.assembly
+              ? "Generated appearances follow the measured layout. Alignment previews show appearance; fit checks use confirmed dimensions."
+              : "Generated models are arranged for inspection, not at physical scale. Confirm measurements to check fit."
             : v.mode === "overlay"
               ? "Generated appearance previews; built CAD also shows measured envelopes. The envelope governs fit."
               : "Measured geometry. Drag to orbit; scroll or pinch to zoom."}
