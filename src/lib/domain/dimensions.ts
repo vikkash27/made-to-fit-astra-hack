@@ -35,8 +35,8 @@ export function previewEnclosureBounds(parts: Part[], p: EnclosureParams) {
   let max: Vec3 = [-Infinity, -Infinity, -Infinity];
   for (const { pt, s } of known) {
     for (let i = 0; i < 3; i++) {
-      min[i] = Math.min(min[i], pt.pose[i]);
-      max[i] = Math.max(max[i], pt.pose[i] + s![i]);
+      min[i] = Math.min(min[i]!, pt.pose[i]!);
+      max[i] = Math.max(max[i]!, pt.pose[i]! + s![i]!);
     }
   }
   const pad = p.wall + p.clearance;

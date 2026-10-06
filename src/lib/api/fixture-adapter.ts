@@ -155,8 +155,8 @@ function sampleConcepts(p: Project, refinement?: string): Concept[] {
       previewImage: conceptPortable,
     },
   ];
-  if (refinement && /portable|carry/i.test(refinement)) return [list[2], list[0], list[1]];
-  if (refinement && /wall/i.test(refinement)) return [list[1], list[0], list[2]];
+  if (refinement && /portable|carry/i.test(refinement)) return [list[2]!, list[0]!, list[1]!];
+  if (refinement && /wall/i.test(refinement)) return [list[1]!, list[0]!, list[2]!];
   return list;
 }
 
@@ -181,7 +181,7 @@ function computeSampleChecks(params: EnclosureParams): Check[] {
 function newJob(p: Project, kind: Job["kind"], apply: string, payload?: unknown, revisionId?: string) {
   const id = uid("job");
   db().jobs[id] = { job_id: id, kind, stage: "queued", project_id: p.id, revision_id: revisionId ?? null, startedAt: now(), apply, payload, error: null };
-  p.jobs = [{ id, kind, stage: "queued", label: jobLabel(kind), startedAt: now(), revisionId }, ...p.jobs].slice(0, 20);
+  p.jobs = [{ id, kind, stage: "queued" as const, label: jobLabel(kind), startedAt: now(), revisionId }, ...p.jobs].slice(0, 20);
   save();
   return { job_id: id };
 }
@@ -417,7 +417,7 @@ export function createFixtureAdapter(): BackendAdapter {
       const j = db().jobs[jobId];
       if (!j) throw new ApiError("not_found", "Unknown job.", 404, false);
       await this.getProject(j.project_id);
-      const { job_id, kind, stage, project_id, revision_id, error } = db().jobs[jobId];
+      const { job_id, kind, stage, project_id, revision_id, error } = db().jobs[jobId]!;
       return { job_id, kind, stage, project_id, revision_id, error };
     },
     async getExports() {
