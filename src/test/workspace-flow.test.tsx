@@ -74,6 +74,22 @@ describe("automatic appearance files", () => {
   );
 });
 describe("Astra interaction", () => {
+  it("resolves real artifact links against the backend while preserving source links", () => {
+    render(
+      <AstraMarkdown
+        text="[Print file](/artifacts/real-file) [Source](https://example.com)"
+        resolveArtifactUrl={(url) => `http://127.0.0.1:8003${url}`}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Print file" })).toHaveAttribute(
+      "href",
+      "http://127.0.0.1:8003/artifacts/real-file",
+    );
+    expect(screen.getByRole("link", { name: "Source" })).toHaveAttribute(
+      "href",
+      "https://example.com",
+    );
+  });
   it("keeps a message draft after a rejected submission and clears it on success", async () => {
     const send = vi
       .fn()

@@ -2,7 +2,13 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 /** No HTML or remote image execution; Markdown's default URL filter rejects unsafe protocols. */
-export function AstraMarkdown({ text }: { text: string }) {
+export function AstraMarkdown({
+  text,
+  resolveArtifactUrl,
+}: {
+  text: string;
+  resolveArtifactUrl?: (url: string) => string;
+}) {
   return (
     <div className="astra-message">
       <Markdown
@@ -12,7 +18,11 @@ export function AstraMarkdown({ text }: { text: string }) {
           a: ({ children, href }) =>
             href ? (
               <a
-                href={href}
+                href={
+                  href.startsWith("/artifacts/") && resolveArtifactUrl
+                    ? resolveArtifactUrl(href)
+                    : href
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="font-medium text-primary underline underline-offset-2"

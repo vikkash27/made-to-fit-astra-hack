@@ -3,6 +3,7 @@ import { JobProgress } from "./JobProgress";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Message, MessageCard, Project, Stage } from "@/lib/domain/types";
+import { getAdapter } from "@/lib/api";
 import { errorMessage, projectKey, useProjectAction } from "@/lib/api/hooks";
 import { parseDimensionInput } from "@/lib/domain/dimensions";
 import { applyCheckedChange } from "@/lib/flows-revision";
@@ -189,7 +190,10 @@ function MessageView({ m, project }: { m: Message; project: Project }) {
         <span className="font-mono text-xs">Astra</span>
         {m.sample && <SampleTag />}
       </div>
-      <AstraMarkdown text={m.text} />
+      <AstraMarkdown
+        text={m.text}
+        resolveArtifactUrl={(url) => getAdapter().resolveArtifactUrl(url)}
+      />
       {m.refs
         ?.filter((r) => r.startsWith("selection:"))
         .map((r) => {

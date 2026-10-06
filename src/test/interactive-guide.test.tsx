@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BuildGuide } from "@/components/workspace/BuildGuide";
 import { WiringPanel } from "@/components/workspace/WiringPanel";
 import { useViewer } from "@/lib/store/viewer-store";
-import type { Revision } from "@/lib/domain/types";
+import type { Project, Revision } from "@/lib/domain/types";
 const ad = vi.hoisted(() => ({
   getBuildGuide: vi.fn(),
   getGuideProgress: vi.fn(),
@@ -114,6 +114,57 @@ beforeEach(() => {
   ad.getWiringPlan.mockResolvedValue({ revision_id: "r", spec_hash: "hash", plan });
 });
 describe("Interactive assembly guide", () => {
+  it("shows available generated models before alignment review without changing measured geometry", async () => {
+    const r = {
+      ...revision,
+      assembly: {
+        parts: [
+          {
+            part_id: "board",
+            role: "hardware_reference",
+            name: "Controller",
+            size_mm: [40, 20, 5],
+            bounds: { min_mm: [0, 0, 0], max_mm: [40, 20, 5] },
+          },
+        ],
+      },
+    } as unknown as Revision;
+    const p = {
+      visualAssets: [
+        {
+          part_id: "board",
+          calibration: {
+            status: "needs_review",
+            bounds: [
+              [0, 0, 0],
+              [1, 1, 1],
+            ],
+          },
+        },
+      ],
+    } as unknown as Project;
+    useViewer.getState().set({ mode: "cad" });
+    render(<BuildGuide revision={r} project={p} />, { wrapper });
+    expect(await screen.findByText(/1 of 1 component models available/)).toHaveTextContent(
+      "automatic alignment remains a visual preview",
+    );
+    await waitFor(() => expect(useViewer.getState().mode).toBe("rendered"));
+    expect(r.assembly?.parts[0]?.size_mm).toEqual([40, 20, 5]);
+    expect(p.visualAssets?.[0]?.calibration.status).toBe("needs_review");
+  });
+  it("blocks overlapping wire completion changes while server progress saves", async () => {
+    ad.getWiringPlan.mockResolvedValue({
+      revision_id: "r",
+      spec_hash: "hash",
+      plan: { ...plan, status: "reviewed" },
+    });
+    render(
+      <WiringPanel revision={revision} progress={progress} savingProgress saveProgress={vi.fn()} />,
+      { wrapper },
+    );
+    const check = await screen.findByLabelText("I completed this wire and its check");
+    expect(check).toBeDisabled();
+  });
   it("saves a check against the accepted revision and changes only viewer state", async () => {
     render(<BuildGuide revision={revision} />, { wrapper });
     const check = await screen.findByLabelText("I completed this step and its check");

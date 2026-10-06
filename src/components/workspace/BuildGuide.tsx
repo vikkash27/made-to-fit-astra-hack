@@ -64,14 +64,6 @@ export function BuildGuide({
       );
     }),
   );
-  const reviewed = hardware.filter((p) =>
-    project?.visualAssets?.some(
-      (a) =>
-        a.part_id === p.part_id &&
-        a.calibration.status === "reviewed" &&
-        a.calibration.aligned_size_mm?.every((n, i) => Math.abs(n - p.size_mm[i]!) < 1e-6),
-    ),
-  );
   useEffect(() => {
     if (!revision.sample && modeled.length) useViewer.getState().set({ mode: "rendered" });
   }, [revision.id, revision.sample, modeled.length]);
