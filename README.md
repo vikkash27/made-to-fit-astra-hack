@@ -1,8 +1,10 @@
+**Live site: [https://made-to-fit-astra-hack.lovable.app/](https://made-to-fit-astra-hack.lovable.app/)**
+
 # Made to Fit
 
 Made to Fit turns the electronics you already own into a project you can build. Upload photos or describe your parts, review Astra's suggestions, enter real measurements, and refine a custom enclosure. Inspect the 3D layout and geometry checks, accept a design revision, then download its print files and review the assembly guidance.
 
-**[Open the live site](https://made-to-fit-astra-hack.lovable.app/)** · [Demo workflow and filming script](docs/DEMO-FILMING.md)
+[Demo workflow and filming script](docs/DEMO-FILMING.md)
 
 The Lovable site currently runs the explicitly labelled sample preview. The Python backend runs locally; Astra analysis, native CAD builds and real downloads require a connected backend. See [Run locally](#run-locally) to try the full workflow.
 
