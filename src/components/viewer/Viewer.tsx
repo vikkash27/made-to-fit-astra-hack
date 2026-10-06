@@ -29,7 +29,7 @@ export default function Viewer({ parts, params, provenance }: Props) {
   return (
     <div className="relative h-full w-full">
       <Canvas shadows dpr={[1, 1.75]} camera={{ position: [0.22, 0.18, 0.22], fov: 32, near: 0.001, far: 10 }} gl={{ antialias: true }}>
-        <color attach="background" args={["#141618"]} />
+        <color attach="background" args={["#efece5"]} />
         <ambientLight intensity={0.35} />
         <directionalLight position={[0.4, 0.8, 0.3]} intensity={1.6} castShadow shadow-mapSize={[1024, 1024]} />
         <Environment resolution={128}>
@@ -38,7 +38,7 @@ export default function Viewer({ parts, params, provenance }: Props) {
         </Environment>
         <Scene parts={parts} params={params} />
         <ContactShadows position={[0, -0.0005, 0]} opacity={0.55} scale={0.6} blur={2.4} far={0.2} />
-        <gridHelper args={[0.6, 30, "#2c3135", "#202427"]} position={[0, -0.001, 0]} />
+        <gridHelper args={[0.6, 30, "#cfcac0", "#e0dcd3"]} position={[0, -0.001, 0]} />
       </Canvas>
       <div className="label-mono pointer-events-none absolute bottom-3 right-4 text-[9.5px] text-muted-foreground">{provenance}</div>
     </div>
@@ -65,7 +65,7 @@ function Scene({ parts, params }: { parts: Part[]; params: EnclosureParams | nul
       front: [0, ty, d * 1.5],
       side: [d * 1.5, ty, 0],
     };
-    const p = pos[v.cameraPreset];
+    const p = pos[v.cameraPreset]!;
     void c.setLookAt(p[0], p[1], p[2], 0, ty, 0, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v.cameraNonce, extent]);
@@ -119,7 +119,7 @@ function Enclosure({ bounds, params, explodeMm }: { bounds: NonNullable<ReturnTy
       depthWrite={!v.xray}
     />
   );
-  const edgeColor = selected ? ACCENT : v.mode === "rendered" ? "#8f8a7f" : "#d7dadc";
+  const edgeColor = selected ? ACCENT : v.mode === "rendered" ? "#8f8a7f" : "#4a5055";
   const onClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     v.select("enclosure");
@@ -194,7 +194,7 @@ function PartMesh({ part, lift }: { part: Part; lift: number }) {
             transparent={v.mode === "overlay"}
             opacity={v.mode === "overlay" ? 0.55 : 1}
           />
-          {(v.showEnvelopes || selected) && <Edges color={selected ? ACCENT : "#e2e4e5"} />}
+          {(v.showEnvelopes || selected) && <Edges color={selected ? ACCENT : "#3a3f43"} />}
         </mesh>
       )}
       {v.mode === "overlay" && showRef && (

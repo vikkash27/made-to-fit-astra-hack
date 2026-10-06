@@ -79,7 +79,7 @@ function MessageView({ m, project }: { m: Message; project: Project }) {
       </div>
       <p className="leading-relaxed text-foreground/90">{m.text}</p>
       {m.refs?.filter((r) => r.startsWith("selection:")).map((r) => {
-        const id = r.split(":")[1];
+        const id = r.split(":")[1] ?? "";
         const part = project.parts.find((p) => p.id === id);
         return part ? (
           <button key={r} onClick={() => select(id)} className="mt-1 text-xs text-primary underline underline-offset-2">

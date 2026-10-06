@@ -102,17 +102,17 @@ const SAMPLE_EVIDENCE: Record<string, Omit<Evidence, "partId">> = {
   "part-controller": {
     candidates: [{ identity: "RP2040 dev board (Pico-class)", confidence: 0.7 }],
     proposals: [{ field: "x", value: 21, sourceId: "src-pico" }, { field: "y", value: 51, sourceId: "src-pico" }, { field: "z", value: 3.9, sourceId: "src-pico" }],
-    sources: [SAMPLE_SOURCES[0]], missing: [], sample: true,
+    sources: [SAMPLE_SOURCES[0]!], missing: [], sample: true,
   },
   "part-display": {
     candidates: [{ identity: "0.96in OLED 128×64, I²C", confidence: 0.6 }],
     proposals: [{ field: "x", value: 27.3, sourceId: "src-oled" }, { field: "y", value: 27.8, sourceId: "src-oled" }],
-    sources: [SAMPLE_SOURCES[1]], missing: ["z"], sample: true,
+    sources: [SAMPLE_SOURCES[1]!], missing: ["z"], sample: true,
   },
   "part-sensor": {
     candidates: [{ identity: "BME280 breakout", confidence: 0.65 }],
     proposals: [{ field: "x", value: 15, sourceId: "src-bme" }, { field: "y", value: 12, sourceId: "src-bme" }],
-    sources: [SAMPLE_SOURCES[2]], missing: ["z"], sample: true,
+    sources: [SAMPLE_SOURCES[2]!], missing: ["z"], sample: true,
   },
   "part-battery": {
     candidates: [{ identity: "LiPo pouch, 503450-class", confidence: 0.4 }],
@@ -155,8 +155,8 @@ function sampleConcepts(p: Project, refinement?: string): Concept[] {
       previewImage: conceptPortable,
     },
   ];
-  if (refinement && /portable|carry/i.test(refinement)) return [list[2], list[0], list[1]];
-  if (refinement && /wall/i.test(refinement)) return [list[1], list[0], list[2]];
+  if (refinement && /portable|carry/i.test(refinement)) return [list[2]!, list[0]!, list[1]!];
+  if (refinement && /wall/i.test(refinement)) return [list[1]!, list[0]!, list[2]!];
   return list;
 }
 
@@ -181,7 +181,7 @@ function computeSampleChecks(params: EnclosureParams): Check[] {
 function newJob(p: Project, kind: Job["kind"], apply: string, payload?: unknown, revisionId?: string) {
   const id = uid("job");
   db().jobs[id] = { job_id: id, kind, stage: "queued", project_id: p.id, revision_id: revisionId ?? null, startedAt: now(), apply, payload, error: null };
-  p.jobs = [{ id, kind, stage: "queued", label: jobLabel(kind), startedAt: now(), revisionId }, ...p.jobs].slice(0, 20);
+  p.jobs = [{ id, kind, stage: "queued" as const, label: jobLabel(kind), startedAt: now(), revisionId }, ...p.jobs].slice(0, 20);
   save();
   return { job_id: id };
 }
@@ -417,7 +417,7 @@ export function createFixtureAdapter(): BackendAdapter {
       const j = db().jobs[jobId];
       if (!j) throw new ApiError("not_found", "Unknown job.", 404, false);
       await this.getProject(j.project_id);
-      const { job_id, kind, stage, project_id, revision_id, error } = db().jobs[jobId];
+      const { job_id, kind, stage, project_id, revision_id, error } = db().jobs[jobId]!;
       return { job_id, kind, stage, project_id, revision_id, error };
     },
     async getExports() {
