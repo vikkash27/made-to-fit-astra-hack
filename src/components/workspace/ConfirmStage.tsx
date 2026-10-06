@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Check, Search } from "lucide-react";
 import type { EnclosureParams, Part, Project, Stage } from "@/lib/domain/types";
