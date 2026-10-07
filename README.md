@@ -4,8 +4,6 @@
 
 Made to Fit turns the electronics you already own into a project you can build. Upload photos or describe your parts, review Astra's suggestions, enter real measurements, and refine a custom enclosure. Inspect the 3D layout and geometry checks, accept a design revision, then download its print files and review the assembly guidance.
 
-[Demo workflow and filming script](docs/DEMO-FILMING.md)
-
 The Lovable site currently runs the explicitly labelled sample preview. The Python backend runs locally; Astra analysis, native CAD builds and real downloads require a connected backend. See [Run locally](#run-locally) to try the full workflow.
 
 ## How it works
@@ -26,7 +24,7 @@ The Lovable site currently runs the explicitly labelled sample preview. The Pyth
 
 ![Part review with width, depth and height inputs in millimetres](docs/screenshots/part-measurements.jpg)
 
-**CAD and print files** — accepted native CAD revision R3 with actual 3MF, STL and STEP downloads. This local verification project uses synthetic dimensions; it is separate from the photographed-parts demo.
+**CAD and print files** — accepted native CAD revision R3 with actual 3MF, STL and STEP downloads. This local verification project uses synthetic dimensions.
 
 ![Accepted enclosure CAD with Bambu P2S 3MF and STEP/STL downloads](docs/screenshots/cad-print-files.jpg)
 
@@ -87,7 +85,7 @@ uv run pytest -q
 uv run ruff check app tests
 ```
 
-For an isolated live CAD regression, run `python -m scripts.demo_fixture` from `backend/` with a configured API endpoint. This writes only local proof records and makes no provider calls. See [CONTINUITY.md](CONTINUITY.md) for the verified checkpoint and [docs/FRONTEND-INTEGRATION.md](docs/FRONTEND-INTEGRATION.md) for transport/coordinate details.
+See [CONTINUITY.md](CONTINUITY.md) for the verified checkpoint and [docs/FRONTEND-INTEGRATION.md](docs/FRONTEND-INTEGRATION.md) for transport/coordinate details.
 
 ## Hosted frontend
 
